@@ -1,0 +1,70 @@
+---
+- name: CLI Tools
+  connection: local
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+
+   - name: Install Hashicorp Tools
+     shell: |
+      mkdir -p ~/hashicorp
+      cd ~/hashicorp
+      wget "https://releases.hashicorp.com/{{ item.tool }}/{{ item.version }}/{{ item.tool }}_{{ item.version }}_linux_amd64.zip"
+      unzip "{{ item.tool }}_{{ item.version }}_linux_amd64.zip"
+      sudo install "{{ item.tool }}" /usr/local/bin/
+     with_items:
+      - { tool: 'terraform', version: '0.12.26' }
+      - { tool: 'packer', version: '1.6.0' }
+     args:
+      warn: no
+   
+   - name: Install Http
+     snap:
+      name: http
+      channel: latest/stable
+      state: present
+
+   - name: Install Snyk
+     npm:
+      name: snyk
+      version: 1.346.0
+      global: yes
+
+   - name: Install Trivy
+     apt:
+      deb: https://github.com/aquasecurity/trivy/releases/download/v0.9.1/trivy_0.9.1_Linux-64bit.deb
+
+   - name: Install CircleCI
+     snap:
+      name: circleci
+      channel: latest/stable
+      state: present
+
+   - name: Install YQ
+     snap:
+      name: yq
+      channel: latest/stable
+      state: present
+      
+   - name: Install Siege
+     apt:
+      name: siege=4.0.4-1build1
+      state: present
+
+   - name: Install PSQL
+     apt:
+      name: postgresql-client=10+190ubuntu0.1
+      state: present
+
+   - name: Install JQ
+     apt:
+      name: jq=1.5+dfsg-2
+      state: present
+
+   - name: Install Shellcheck
+     apt:
+      name: shellcheck=0.4.6-1
+      state: present

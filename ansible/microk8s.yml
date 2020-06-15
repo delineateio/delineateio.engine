@@ -1,0 +1,31 @@
+---
+- name: Microk8s
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks: 
+
+   - name: Install Microk8s
+     snap:
+      name:
+        - microk8s
+      channel: 1.18/stable
+      classic: true
+      state: present
+
+   - name: Configure Microk8s
+     shell: |
+      usermod -a -G microk8s vagrant
+      iptables -P FORWARD ACCEPT
+      echo '{"insecure-registries" : ["localhost:32000"]}' > /etc/docker/daemon.json
+     args:
+      warn: no
+   
+   - name: Enable Microk8s Services
+     command: "microk8s enable {{ item }}"
+     with_items:
+      - registry
+      - dns

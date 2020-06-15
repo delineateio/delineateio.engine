@@ -1,0 +1,78 @@
+---
+- name: Bootstrap
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    sudors:
+      vagrant
+    ansible_python_interpreter: /usr/bin/python3
+    live_patch_token: "{{ lookup('env', 'LIVE_PATCH_TOKEN') }}"
+  become: true
+  tasks: 
+
+   - name: Update Apt
+     apt:
+      update_cache: yes
+
+   - name: Upgrade Apt
+     apt:
+      upgrade: "yes"
+      update_cache: true
+      cache_valid_time: 172800 # Two days
+
+   - name: Common Dependencies
+     apt:
+      pkg:
+       - apt-transport-https=1.6.12ubuntu0.1
+       - ca-certificates=20190110~18.04.1
+       - curl=7.58.0-2ubuntu3.9
+       - gnupg-agent=2.2.4-1ubuntu1.2
+       - gnupg2=2.2.4-1ubuntu1.2
+       - pass=1.7.1-3
+       - software-properties-common=0.96.24.32.13
+       - unzip=6.0-21ubuntu1
+       - tree=1.7.0-5
+       - iptables-persistent=1.0.4+nmu2ubuntu1
+       - nmap=7.60-1ubuntu5
+       - rpm=4.14.1+dfsg1-2
+       - apache2-utils=2.4.29-1ubuntu4.13
+      state: present
+
+   - name: Install Npm
+     apt:
+      name: npm=3.5.2-0ubuntu4
+
+   - name: Install Pip
+     apt:
+      name: python3-pip=9.0.1-2.3~ubuntu1.18.04.1
+
+  # Adds time to sync to Cloudflare time
+  # https://www.cloudflare.com/time/
+   - name: "Add Cloudflare Time"
+     copy:
+      remote_src: yes
+      src: /files/timesyncd.conf
+      dest: /etc/systemd/timesyncd.conf
+
+   - name: "Set ntp On" 
+     command: timedatectl set-ntp true
+
+   - name: "Time Sync Config"
+     systemd:
+      name: systemd-timesyncd.service 
+      state: restarted
+      daemon_reload: yes
+      enabled: yes
+
+   - name: "Adds Bash Profile"
+     copy:
+      remote_src: yes
+      src: /files/.bash_profile
+      dest: ~/.bash_profile
+     become_user: vagrant
+
+   - name: Clean Packages
+     apt:
+      autoremove: yes
+      purge: yes

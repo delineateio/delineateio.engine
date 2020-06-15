@@ -1,0 +1,34 @@
+---
+- name: Git
+  connection: local
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  become_user: vagrant
+  tasks:
+
+   # TODO: Get the details from the host
+   - name: "Configure Git Global"
+     command: "git config --global {{ item }}"
+     with_items:
+      - core.editor nano
+      - commit.template ~/.gitmessage.txt
+      - gpg.program gpg2
+      - commit.gpgsign false
+      - push.gpgSign true
+      
+   - name: "Add Commit Template"
+     copy:
+      remote_src: yes
+      src: /files/.gitmessage.txt
+      dest: ~/.gitmessage.txt
+
+   - name: Configure Git Hooks
+     shell: | 
+      cd ~/project
+      git config core.hooksPath .githooks
+      chmod -R +x ./.githooks/
+     args:
+      warn: no

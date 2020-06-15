@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+# shell checks the scripts
+shellcheck $(find $ROOT -type f -name "*.sh")

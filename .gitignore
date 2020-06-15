@@ -1,0 +1,8 @@
+.logs/
+.vscode/
+.vagrant/
+.secrets/
+.tmp/
+.terraform/
+.DS_Store
+__debug_bin

@@ -1,0 +1,33 @@
+---
+- name: Go
+  connection: local
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+  
+   - name: Install Go
+     snap:
+      name: go
+      channel: 1.14/stable
+      classic: true
+      state: present
+
+   - name: Install Gosec
+     snap:
+      name: gosec
+      channel: latest/stable
+      classic: true
+      state: present
+
+   - name: Install Staticcheck
+     when: ansible_local.staticcheck.installed == false
+     shell: | 
+      cd ~/
+      wget https://github.com/dominikh/go-tools/releases/download/2020.1.4/staticcheck_linux_amd64.tar.gz
+      tar -xvf staticcheck_linux_amd64.tar.gz
+      sudo install ./staticcheck/staticcheck /usr/local/bin/
+     args:
+      warn: no

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -z $(command -v container-structure-test) ]
+then
+      echo "{\"installed\" : false}"
+else
+      echo "{\"installed\" : true}"
+fi

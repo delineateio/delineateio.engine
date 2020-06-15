@@ -1,0 +1,114 @@
+---
+- name: GCloud
+  connection: local
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+
+   # This needs to be locked to a specific version - this could drift!
+   # https://github.com/ansible/role-install-gcloud
+   - name: Install GCloud
+     when: ansible_local.gcloud.installed == false
+     shell: |
+        cd ~/
+        curl https://sdk.cloud.google.com > install.sh
+        bash install.sh --disable-prompts
+     become_user: vagrant
+     args:
+      warn: no
+        
+   - name: Authenticate GCloud
+     shell: |
+       gcloud auth activate-service-account \
+        ${GCP_SERVICE_ACCOUNT} \
+        --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+        gcloud config set account ${GCP_SERVICE_ACCOUNT}
+     become_user: vagrant
+     args:
+      warn: no
+
+   - name: Configure GCloud
+     shell: |
+       gcloud config set project ${GCP_PROJECT_ID}
+       gcloud config set compute/region ${GCP_REGION}
+       gcloud config set compute/zone ${GCP_ZONE}
+     become_user: vagrant
+     args:
+      warn: no
+
+   # install via gcloud for version alignment
+   - name: Install Skaffold
+     when: ansible_local.skaffold.installed == false
+     command: gcloud components install skaffold --quiet
+     become_user: vagrant
+     args:
+      warn: no
+
+   - name: Install Structure Test
+     when: ansible_local.structure.installed == false
+     shell: |
+      cd ~/
+      curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+      chmod +x container-structure-test-linux-amd64 
+      mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+     args:
+      warn: no
+  
+   # install via kubectl for version alignment
+   - name: Install Kubectl 
+     when: ansible_local.kubectl.installed == false
+     command: gcloud components install kubectl --quiet
+     become_user: vagrant
+     args:
+      warn: no
+
+   # TODO: there are ugly paths!
+   - name: Add Local Cluster
+     shell: |
+      mkdir -p /home/vagrant/.kube
+      microk8s kubectl config view --raw > /home/vagrant/.kube/config
+      chown -f -R vagrant /home/vagrant/.kube
+     args:
+      warn: no
+
+   - name: Rename Local Cluster
+     command: kubectl config rename-context microk8s local
+     become_user: vagrant
+
+   - name: Add Staging Cluster
+     command: gcloud container clusters get-credentials ${GCP_CLUSTER_NAME}
+     become_user: vagrant
+
+   - name: Rename Staging Cluster
+     shell: kubectl config rename-context $(kubectl config current-context) staging
+     become_user: vagrant
+
+   - name: Configure Docker 
+     shell: |
+       kubectl config use-context cloud
+       gcloud components install docker-credential-gcr -q
+       gcloud auth configure-docker -q
+       docker-credential-gcr configure-docker
+     become_user: vagrant
+     args:
+      warn: no
+
+  # https://blog.container-solutions.com/using-google-container-registry-with-kubernetes
+   - name: Authorise Cluster Pull
+     shell: |
+        kubectl config use-context cloud
+        kubectl create secret docker-registry \
+          gcr-json-key --docker-server=${GCP_REGISTRY} \
+          --docker-username=_json_key \
+          --docker-password="$(cat ${GOOGLE_APPLICATION_CREDENTIALS})" 
+          --docker-email=${GCP_SERVICE_ACCOUNT}
+          --dry-run -o yaml | kubectl replace -f -
+
+        kubectl patch serviceaccount default \
+          -p '{"imagePullSecrets": [{"name": "gcr-json-key"}]}'
+     become_user: vagrant
+     args:
+      warn: no

@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:8080
+
+GET {{baseUrl}}/healthz HTTP/2
+content-type: application/json
+
+###
+
+POST {{baseUrl}}/customer HTTP/2
+content-type: application/json
+
+{
+    "forename": "jonathan",
+    "surname": "fenwick"
+}

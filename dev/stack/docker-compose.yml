@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+
+  # https://itnext.io/wildcard-lets-encrypt-certificate-2b6133a1acdf
+  # https://www.digitalocean.com/community/tutorials/how-to-use-traefik-as-a-reverse-proxy-for-docker-containers-on-ubuntu-18-04#conclusion
+ 
+  customers:
+    container_name: customers-stack
+    image: customers:stack
+    build: ../services/customers
+    ports:
+      - 8081:8080
+    environment:
+      - ENV=stack
+      - LOCATION=/config
+    restart: always
+    links:
+      - database
+    depends_on:
+      - database
+
+  database:
+    container_name: database-stack
+    image: postgres:11.6
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    restart: always

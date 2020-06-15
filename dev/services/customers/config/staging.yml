@@ -1,0 +1,20 @@
+server:
+  port: 8080
+  mode: info
+  timeouts:
+    read: 15s
+    write: 15s
+    hammer: 30m
+logging:
+  level: warn
+db:
+  customers:
+    type: postgres
+    connection: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+    limits:
+      maxIdle: 10
+      maxOpen: 75
+      maxLifetime: 10m
+    retries:
+      attempts: 10
+      delay: 1s

@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod
+  labels:
+    run: pod
+spec:
+  containers:
+  - name: database
+    image: postgres:11.6
+    env:
+    - name: POSTGRES_USER
+      value: postgres
+    - name: POSTGRES_PASSWORD
+      value: postgres
+    - name: POSTGRES_DB
+      value: postgres
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "200m"
+      limits:
+        memory: "64Mi"
+        cpu: "400m"
+    ports:
+      - containerPort: 5432
+  - name: customers
+    image: customers
+    env:
+    - name: ENV
+      value: "local" # TODO: need to be injected into container
+    - name: LOCATION
+      value: "/config"
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "200m"
+      limits:
+        memory: "64Mi"
+        cpu: "400m"
+    ports:
+      - name: probe-port
+        containerPort: 8080
+        hostPort: 8080
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: probe-port
+      failureThreshold: 1
+      periodSeconds: 10
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: probe-port
+      failureThreshold: 30
+      periodSeconds: 10
