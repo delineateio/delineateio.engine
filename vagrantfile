@@ -4,7 +4,6 @@ ansible_provisioning_path = "/home/vagrant"
 ansible_version   = "2.9.10"
 ansible_verbose   = false
 ansible_playbooks = ["bootstrap","facts","profile","docker","microk8s","gcloud","go","cli","git"]
-ansible_playbooks = ["git"]
 
 Vagrant.configure("2") do |config|
 

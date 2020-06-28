@@ -42,8 +42,6 @@
       name: database-dev
       image: postgres:11.6
       state: started
-      recreate: yes
-      restart: yes
       ports:
         - 5432:5432
       env:

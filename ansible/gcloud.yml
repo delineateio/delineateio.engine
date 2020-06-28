@@ -65,24 +65,37 @@
      args:
       warn: no
 
+   - name: Check for ~/.kube/config
+     local_action: stat path=~/.kube/config
+     register: kube_config
+     become_user: vagrant
+
+   - name: Create .kube Directory
+     when: kube_config.stat.exists == false
+     command: mkdir -p ~/.kube
+     become_user: vagrant
+
+   - name: Change .kube Permissions
+     when: kube_config.stat.exists == false
+     command: chown -f -R vagrant /home/vagrant/.kube
+
    # TODO: there are ugly paths!
    - name: Add Local Cluster
-     shell: |
-      mkdir -p /home/vagrant/.kube
-      microk8s kubectl config view --raw > /home/vagrant/.kube/config
-      chown -f -R vagrant /home/vagrant/.kube
-     args:
-      warn: no
+     when: kube_config.stat.exists == false
+     command: microk8s kubectl config view --raw > /home/vagrant/.kube/config
 
    - name: Rename Local Cluster
+     when: kube_config.stat.exists == false
      command: kubectl config rename-context microk8s local
      become_user: vagrant
 
    - name: Add Staging Cluster
+     when: kube_config.stat.exists == false
      command: gcloud container clusters get-credentials ${GCP_CLUSTER_NAME}
      become_user: vagrant
 
    - name: Rename Staging Cluster
+     when: kube_config.stat.exists == false
      shell: kubectl config rename-context $(kubectl config current-context) staging
      become_user: vagrant
 

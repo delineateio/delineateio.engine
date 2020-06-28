@@ -11,41 +11,42 @@
   become_user: vagrant
   tasks:
 
+   - name: Check for ~/bash_profile
+     local_action: stat path=~/.bash_profile
+     register: profile
+
    - name: Adds Bash Profile
-     #when: ansible_local.bash_profile.exists == false
+     when: profile.stat.exists == false
      copy:
       remote_src: yes
       src: /files/.bash_profile
       dest: ~/.bash_profile
+     become_user: vagrant
 
    - name: Add Git Env
-     #when: ansible_local.bash_profile.exists == false
+     when: profile.stat.exists == false
      blockinfile:
       marker: "# {mark} ANSIBLE MANAGED BLOCK GIT"
       block: "{{ lookup('file', '~/project/.env/git.env') }}"
       dest: ~/.bash_profile
-      backup: yes
 
    - name: Add Google Env
-     #when: ansible_local.bash_profile.exists == false
+     when: profile.stat.exists == false
      blockinfile:
       marker: "# {mark} ANSIBLE MANAGED BLOCK GOOGLE"
       block: "{{ lookup('file', '~/project/.env/google.env') }}"
       dest: ~/.bash_profile
-      backup: yes
 
    - name: Add Cloudflare Env
-     #when: ansible_local.bash_profile.exists == false
+     when: profile.stat.exists == false
      blockinfile:
       marker: "# {mark} ANSIBLE MANAGED BLOCK CLOUDFLARE"
       block: "{{ lookup('file', '~/project/.env/cloudflare.env') }}"
       dest: ~/.bash_profile
-      backup: yes
 
    - name: Add Snyk Env
-     #when: ansible_local.bash_profile.exists == false
+     when: profile.stat.exists == false
      blockinfile:
       marker: "# {mark} ANSIBLE MANAGED BLOCK SNYK"
       block: "{{ lookup('file', '~/project/.env/snyk.env') }}"
       dest: ~/.bash_profile
-      backup: yes
