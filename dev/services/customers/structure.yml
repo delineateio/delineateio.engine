@@ -9,7 +9,7 @@ metadataTest:
     - key: org.label-schema.url
       value: "https://www.delineate.io/"
     - key: org.label-schema.vcs-url
-      value: "https://github.com/delineateio/delineateio.core"
+      value: "https://github.com/delineateio/delineateio.engine"
     - key: org.label-schema.vendor
       value: "delineate.io"
   exposedPorts: ["8080"]

@@ -5,7 +5,7 @@ provider "cloudflare" {
 }
 
 provider "google" {
-  credentials = file("../.secrets/gcloud.json")
+  credentials = file("../.env/gcloud.json")
   project     = "my-project-id"
   region      = "us-central1"
 }

@@ -8,7 +8,7 @@
     sudoers:
       - vagrant
   become: true
-  tasks: 
+  tasks:
 
    - name: Install Docker Pip
      pip:
@@ -30,7 +30,7 @@
       name: vagrant
       groups: docker
       append: yes
-        
+
    - name: Install Docker-Compose
      apt:
       pkg:

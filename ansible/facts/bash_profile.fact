@@ -1,0 +1,8 @@
+#!/bin/bash
+
+FILE=~/.bash_profile
+if [[ -f "$FILE" ]]; then
+    echo "{\"exists\" : true}"
+else
+      echo "{\"exists\" : false}"
+fi

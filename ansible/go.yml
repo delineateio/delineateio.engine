@@ -7,7 +7,7 @@
     ansible_python_interpreter: /usr/bin/python3
   become: true
   tasks:
-  
+
    - name: Install Go
      snap:
       name: go
@@ -24,7 +24,7 @@
 
    - name: Install Staticcheck
      when: ansible_local.staticcheck.installed == false
-     shell: | 
+     shell: |
       cd ~/
       wget https://github.com/dominikh/go-tools/releases/download/2020.1.4/staticcheck_linux_amd64.tar.gz
       tar -xvf staticcheck_linux_amd64.tar.gz

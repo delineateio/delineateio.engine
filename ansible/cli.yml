@@ -20,7 +20,7 @@
       - { tool: 'packer', version: '1.6.0' }
      args:
       warn: no
-   
+
    - name: Install Http
      snap:
       name: http
@@ -48,7 +48,7 @@
       name: yq
       channel: latest/stable
       state: present
-      
+
    - name: Install Siege
      apt:
       name: siege=4.0.4-1build1

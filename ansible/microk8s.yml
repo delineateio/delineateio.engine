@@ -6,7 +6,7 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   become: true
-  tasks: 
+  tasks:
 
    - name: Install Microk8s
      snap:
@@ -23,7 +23,7 @@
       echo '{"insecure-registries" : ["localhost:32000"]}' > /etc/docker/daemon.json
      args:
       warn: no
-   
+
    - name: Enable Microk8s Services
      command: "microk8s enable {{ item }}"
      with_items:

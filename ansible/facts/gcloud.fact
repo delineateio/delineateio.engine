@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ -z $(command -v gcloud) ]
+if [ -z "$(command -v gcloud)" ]
 then
-      echo "{\"installed\" : "false"}"
+      echo "{\"installed\" : false}"
 else
-      echo "{\"installed\" : "true"}"
+      echo "{\"installed\" : true}"
 fi

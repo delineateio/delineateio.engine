@@ -19,7 +19,7 @@
      become_user: vagrant
      args:
       warn: no
-        
+
    - name: Authenticate GCloud
      shell: |
        gcloud auth activate-service-account \
@@ -52,13 +52,13 @@
      shell: |
       cd ~/
       curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
-      chmod +x container-structure-test-linux-amd64 
+      chmod +x container-structure-test-linux-amd64
       mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
      args:
       warn: no
-  
+
    # install via kubectl for version alignment
-   - name: Install Kubectl 
+   - name: Install Kubectl
      when: ansible_local.kubectl.installed == false
      command: gcloud components install kubectl --quiet
      become_user: vagrant
@@ -86,7 +86,7 @@
      shell: kubectl config rename-context $(kubectl config current-context) staging
      become_user: vagrant
 
-   - name: Configure Docker 
+   - name: Configure Docker
      shell: |
        kubectl config use-context cloud
        gcloud components install docker-credential-gcr -q
@@ -103,7 +103,7 @@
         kubectl create secret docker-registry \
           gcr-json-key --docker-server=${GCP_REGISTRY} \
           --docker-username=_json_key \
-          --docker-password="$(cat ${GOOGLE_APPLICATION_CREDENTIALS})" 
+          --docker-password="$(cat ${GOOGLE_APPLICATION_CREDENTIALS})"
           --docker-email=${GCP_SERVICE_ACCOUNT}
           --dry-run -o yaml | kubectl replace -f -
 

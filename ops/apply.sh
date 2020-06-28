@@ -11,6 +11,6 @@ cd "$ROOT/ops"
 source variables.env
 
 # Build infrastructure
-terraform init 
+terraform init
 terraform validate
 terraform apply -lock=true -refresh=true -auto-approve

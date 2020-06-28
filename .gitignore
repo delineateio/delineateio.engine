@@ -1,8 +1,9 @@
-.logs/
+# dirs
+.env/
+.terraform/
 .vscode/
 .vagrant/
-.secrets/
-.tmp/
-.terraform/
-.DS_Store
-__debug_bin
+
+# files
+.todo
+.secrets.baseline

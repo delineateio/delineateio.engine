@@ -30,6 +30,6 @@ workflows:
       - scan
 
 # https://circleci.com/docs/2.0/using-orbs/
-# 
+#
 
 # docker pull docker/whalesay

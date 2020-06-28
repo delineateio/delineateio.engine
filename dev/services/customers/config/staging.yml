@@ -10,7 +10,7 @@ logging:
 db:
   customers:
     type: postgres
-    connection: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+    connection: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable # pragma: allowlist secret
     limits:
       maxIdle: 10
       maxOpen: 75

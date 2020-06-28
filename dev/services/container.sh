@@ -6,7 +6,7 @@ ROOT="$(git rev-parse --show-toplevel)"
 SERVICE="${1:-customers}"
 FOLDER="${ROOT}/dev/services/${SERVICE}"
 ENV="prod" # Verifies the production config
-LOCATION="/config" 
+LOCATION="/config"
 PORT=$(yq r - 'server.port' < "${FOLDER}/config/${ENV}.yml")
 IMAGE_NAME="${SERVICE}:$(git rev-parse --short HEAD)-${ENV}"
 
@@ -75,9 +75,8 @@ echo
 
 # Security scan
 # shellcheck source=/dev/null
-source "${ROOT}/.secrets/snyk.env"
 echo "${START}Snyk image scan starting...${RESET}"
-snyk config -q set api="${SNYK_TOKLEN}"
+snyk config -q set api="${SNYK_TOKEN}"
 snyk test --docker "${IMAGE_NAME}"
 echo "${COMPLETE}Snyk image scan completed!${RESET}"
 echo

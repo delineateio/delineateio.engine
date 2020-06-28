@@ -19,9 +19,9 @@ db:
       attempts: 5
       delay: 100ms
 
-#health 
+#health
   # checks
-    # name: 
+    # name:
     # type: http | db
     # url
     # interval

@@ -1,0 +1,51 @@
+---
+- name: Profile
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    sudors:
+      vagrant
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  become_user: vagrant
+  tasks:
+
+   - name: Adds Bash Profile
+     #when: ansible_local.bash_profile.exists == false
+     copy:
+      remote_src: yes
+      src: /files/.bash_profile
+      dest: ~/.bash_profile
+
+   - name: Add Git Env
+     #when: ansible_local.bash_profile.exists == false
+     blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED BLOCK GIT"
+      block: "{{ lookup('file', '~/project/.env/git.env') }}"
+      dest: ~/.bash_profile
+      backup: yes
+
+   - name: Add Google Env
+     #when: ansible_local.bash_profile.exists == false
+     blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED BLOCK GOOGLE"
+      block: "{{ lookup('file', '~/project/.env/google.env') }}"
+      dest: ~/.bash_profile
+      backup: yes
+
+   - name: Add Cloudflare Env
+     #when: ansible_local.bash_profile.exists == false
+     blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED BLOCK CLOUDFLARE"
+      block: "{{ lookup('file', '~/project/.env/cloudflare.env') }}"
+      dest: ~/.bash_profile
+      backup: yes
+
+   - name: Add Snyk Env
+     #when: ansible_local.bash_profile.exists == false
+     blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED BLOCK SNYK"
+      block: "{{ lookup('file', '~/project/.env/snyk.env') }}"
+      dest: ~/.bash_profile
+      backup: yes

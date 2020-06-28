@@ -3,7 +3,7 @@ Vagrant.require_version "=2.2.9"
 ansible_provisioning_path = "/home/vagrant"
 ansible_version   = "2.9.10"
 ansible_verbose   = false
-# ansible_playbooks = ["bootstrap","facts","docker","microk8s","gcloud","go","cli","git"]
+ansible_playbooks = ["bootstrap","facts","profile","docker","microk8s","gcloud","go","cli","git"]
 ansible_playbooks = ["git"]
 
 Vagrant.configure("2") do |config|
@@ -23,9 +23,9 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "./ansible/files", "/files", owner: "root", group: "root"
 
   # copies the default .git files
-  config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig", run: "always"
-  config.vm.provision "file", source: "~/.gitignore_global", destination: "~/.gitignore_global", run: "always"
-  
+  # config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa", run: "always"
+  # config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub", run: "always"
+
   ansible_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
       ansible.provisioning_path = ansible_provisioning_path

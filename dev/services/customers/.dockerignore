@@ -1,5 +1,5 @@
 # excludes env
-env/ 
+env/
 
 # excludes k8s related items
 k8s/

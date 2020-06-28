@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z $(command -v kubectl) ]
+if [ -z "$(command -v kubectl)" ]
 then
       echo "{\"installed\" : false}"
 else

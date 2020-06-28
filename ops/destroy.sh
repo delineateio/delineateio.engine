@@ -13,4 +13,4 @@ source variables.env
 
 # Runs terraform
 terraform validate
-terraform destroy -lock=true -refresh=true -auto-approve 
+terraform destroy -lock=true -refresh=true -auto-approve

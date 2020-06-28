@@ -2,23 +2,23 @@
 
 ## Purpose
 
-The purpose of this project is to provide core services for the delineate.io engine.  
+The purpose of this project is to provide core services for the delineate.io engine.
 
 Currently this repo  contains an example service only which has been used to refine the developer workflow and tooling that will be used to develop the features.
 
 ## Principles
 
 * All dependencies must be strongly versioned (e.g. image tags, package versions, tool versions) to mitigate any version drift that causes unexpected issues
-* All sensitive keys must be stored in `./.secrets` so that they are excluded from being committed to the remote repo
+* All sensitive keys must be stored in `./.env` so that they are excluded from being committed to the remote repo
 * All files related to a specific service must be contained in a service sub directory in `./dev/services` to mitigate tight coupling
 
 ## Required Secrets
 
-The following secrets should be stored within `./.secrets` directory.  These will need to be confirmed on a user by user basis.  
+The following secrets should be stored within `./.env` directory.  These will need to be confirmed on a user by user basis.
 
 ### Cloudflare Credentials
 
-The `./.secrets/cloudflare.env` needs to be present contain the following env variables.
+The `./.env/cloudflare.env` needs to be present contain the following env variables.
 
 ```shell
 export CLOUDFLARE_EMAIL=${VAR}
@@ -30,23 +30,23 @@ Review the Cloudflare documentation [here](https://support.cloudflare.com/hc/en-
 
 ### GCP Service Account Key
 
-The `./.secrets/gcloud.json` file is required to contain a GCP service account key with the required permissions. Please refer to the [GCP Documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for creating service account keys if required.
+The `./.env/gcloud.json` file is required to contain a GCP service account key with the required permissions. Please refer to the [GCP Documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) for creating service account keys if required.
 
 ### Snyk Token
 
-The `./.secrets/snyk.env` should be present and a API token for an `snyk` account.  
+The `./.env/snyk.env` should be present and a API token for an `snyk` account.
 
 ```shell
 export SNYK_TOKEN=${VAR}
 ```
 
-To obtain a token the [offical documentation](https://support.snyk.io/hc/en-us/articles/360004037557-Authentication-for-API) should be consulted if required.  
+To obtain a token the [offical documentation](https://support.snyk.io/hc/en-us/articles/360004037557-Authentication-for-API) should be consulted if required.
 
 ## Development Environment
 
 ### Overview
 
-To make setup of the development environment as easy as possible a Hashicorp Vagrant file has been provided with an Ansible playbooks to install dependencies.  
+To make setup of the development environment as easy as possible a Hashicorp Vagrant file has been provided with an Ansible playbooks to install dependencies.
 
 *Please note that the `vagrantfile` contains specific configuration to run using VMWare provider, which is a commercial product.  This can be commented out if required, for example to use Virtualbox.*
 
@@ -92,6 +92,18 @@ vagrant reload
 vagrant destroy
 ```
 
+## Git Configuration
+
+Git configuration is difficult to fully automate securely.  Currently configuration is semi automated.
+
+Once the Vagrant VM has been provision there will be further steps to configure GPG keys, please review the following documentation to create and config these.
+
+* [Generating GPG Keys](https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key)
+* [Add GPG Keys to Github](https://help.github.com/en/github/authenticating-to-github/)adding-a-new-gpg-key-to-your-github-account)
+
+Generate the SSH key
+`ssh-keygen -t rsa -C "jonathan.fenwick@delineate.io"`
+
 ## Useful Scripts
 
 The following documented scripts have been provided for convience to aid development rather than hand crafting repetitive commands.
@@ -110,7 +122,7 @@ The `./dev/services/quality.sh $SERVICE` script performs a series of steps that 
 
 ### Up Script
 
-The `up` script provided at `./dev/stack/up.sh` uses `docker-compose` to stand up a lightweight stack for testing purposes.  Re-running the script will take down and they put up the stack.  
+The `up` script provided at `./dev/stack/up.sh` uses `docker-compose` to stand up a lightweight stack for testing purposes.  Re-running the script will take down and they put up the stack.
 
 For the full documentation please refer to `docker` and the `docker-compose` [offical documentation](https://github.com/docker/compose).
 
@@ -130,7 +142,7 @@ The script provided at `./dev/services/local.sh $SERVICE` will switch to the loc
 # To list the pods post deployment
 kubectl get pods
 
-# Retrieve  
+# Retrieve
 kubectl logs $POD $CONTAINER
 
 # Delete a specific pod
@@ -142,6 +154,6 @@ kubectl delete pods --all
 
 ## Host Debugging
 
-Debugging is undertaken from in the main from the host desktop using the developers IDE of choice.  
+Debugging is undertaken from in the main from the host desktop using the developers IDE of choice.
 
 To enable this there is port forwarding implemented between the host and the guest for port `5432` to enable connection to `postgres` which is running inside the guest VM.  This is configured within `./vagrantfile`.

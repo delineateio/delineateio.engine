@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z $(command -v skaffold) ]
+if [ -z "$(command -v skaffold)" ]
 then
       echo "{\"installed\" : false}"
 else

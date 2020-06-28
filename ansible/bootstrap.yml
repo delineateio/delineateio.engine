@@ -1,15 +1,14 @@
 ---
 - name: Bootstrap
   connection: local
-  gather_facts: false
+  gather_facts: true
   hosts: all
   vars:
     sudors:
       vagrant
     ansible_python_interpreter: /usr/bin/python3
-    live_patch_token: "{{ lookup('env', 'LIVE_PATCH_TOKEN') }}"
   become: true
-  tasks: 
+  tasks:
 
    - name: Update Apt
      apt:
@@ -55,22 +54,15 @@
       src: /files/timesyncd.conf
       dest: /etc/systemd/timesyncd.conf
 
-   - name: "Set ntp On" 
+   - name: "Set ntp On"
      command: timedatectl set-ntp true
 
    - name: "Time Sync Config"
      systemd:
-      name: systemd-timesyncd.service 
+      name: systemd-timesyncd.service
       state: restarted
       daemon_reload: yes
       enabled: yes
-
-   - name: "Adds Bash Profile"
-     copy:
-      remote_src: yes
-      src: /files/.bash_profile
-      dest: ~/.bash_profile
-     become_user: vagrant
 
    - name: Clean Packages
      apt:

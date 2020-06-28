@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z $(command -v staticcheck) ]
+if [ -z "$(command -v staticcheck)" ]
 then
       echo "{\"installed\" : false}"
 else

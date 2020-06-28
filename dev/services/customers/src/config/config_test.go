@@ -1,7 +1,5 @@
 package config
 
-//TODO: Need to write unit tests for callbacks
-
 import (
 	"testing"
 	"time"

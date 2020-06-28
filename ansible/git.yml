@@ -1,7 +1,7 @@
 ---
 - name: Git
   connection: local
-  gather_facts: true
+  gather_facts: false
   hosts: all
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -9,26 +9,50 @@
   become_user: vagrant
   tasks:
 
-   # TODO: Get the details from the host
+   - name: Add Git Ignores
+     copy:
+      remote_src: no
+      src: /files/.gitignore_global
+      dest: ~/.gitignore_global
+
+   - name: Generate GPG Key
+     command: gpg2 --batch --gen-key ~/project/.env/gpg_options
+
+   - name: Extract Public Key
+     command: gpg2 --armor --output ~/.public.gpg --export ${GIT_EMAIL}
+
    - name: "Configure Git Global"
      command: "git config --global {{ item }}"
      with_items:
+      - user.name ${GIT_NAME}
+      - user.email ${GIT_EMAIL}
       - core.editor nano
+      - core.excludesfile ~/.gitignore_global
       - commit.template ~/.gitmessage.txt
       - gpg.program gpg2
-      - commit.gpgsign false
-      - push.gpgSign true
-      
+
    - name: "Add Commit Template"
      copy:
       remote_src: yes
       src: /files/.gitmessage.txt
       dest: ~/.gitmessage.txt
 
-   - name: Configure Git Hooks
-     shell: | 
-      cd ~/project
-      git config core.hooksPath .githooks
-      chmod -R +x ./.githooks/
-     args:
-      warn: no
+   - name: Install Pre-Commit Pip
+     pip:
+      name: pre-commit==2.5.1
+
+   - name: Install Detect Secrets
+     pip:
+      name: detect-secrets==0.13.1
+
+   - name: Install Ansible Lint
+     pip:
+      name: detect-secrets==0.13.1
+
+   - name: Install Detect Secrets
+     command: detect-secrets scan > .secrets.baseline
+
+   - name: "Install Git Hooks"
+     command: pre-commit install
+
+# git config --global user.signingkey E870EE00B5D90537
