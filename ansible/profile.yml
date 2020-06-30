@@ -34,7 +34,7 @@
      when: profile.stat.exists == false
      blockinfile:
       marker: "# {mark} ANSIBLE MANAGED BLOCK GOOGLE"
-      block: "{{ lookup('file', '~/project/.env/google.env') }}"
+      block: "{{ lookup('file', '~/project/.env/gcp.env') }}"
       dest: ~/.bash_profile
 
    - name: Add Cloudflare Env

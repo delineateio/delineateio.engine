@@ -1,8 +1,9 @@
 # dirs
 .env/
+.gcloud/
 .terraform/
-.vscode/
 .vagrant/
+.vscode/
 
 # files
 .todo

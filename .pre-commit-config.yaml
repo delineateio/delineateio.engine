@@ -18,6 +18,14 @@ repos:
       entry: ansible-lint --force-color ./ansible
       pass_filenames: false
 
+- repo: https://github.com/gruntwork-io/pre-commit
+  rev: v0.1.9
+  hooks:
+    - id: terraform-fmt
+      name: Lint Terraform
+    - id: terraform-validate
+      name: Validate Terraform
+
 # TODO: Implement golang monorepo checks!
 
 - repo: https://github.com/yelp/detect-secrets.git
