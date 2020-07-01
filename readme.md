@@ -1,10 +1,12 @@
 # Delineate Engine
 
+[![CircleCI](https://circleci.com/gh/delineateio/delineateio.engine.svg?style=shield)](https://circleci.com/gh/delineateio/delineateio.engine)
+
 ## Purpose
 
 The purpose of this project is to provide core services for the delineate.io engine.
 
-Currently this repo  contains an example service only which has been used to refine the developer workflow and tooling that will be used to develop the features.
+Currently this repo only contains an example service which has been used to refine the developer workflow and tooling that will be used to develop the ongoing features.
 
 ## Principles
 
@@ -14,7 +16,7 @@ Currently this repo  contains an example service only which has been used to ref
 
 ## Required Secrets
 
-The following secrets should be stored within `./.env` directory.  These will need to be confirmed on a user by user basis.
+The following secrets should be stored within `./.env` directory.  These will need to be confirmed on a user by user basis.  These secrets are appended into the `~/.bash_file` so are available at runtime.
 
 ### Cloudflare Credentials
 
@@ -72,9 +74,13 @@ The `vagrantfile` ensures that the following components are installed and config
 * [Siege](https://github.com/JoeDog/siege) -> Command line for loading basic load testing of HTTP endpoints
 * [CircleCI](https://circleci.com/docs/2.0/local-cli/) -> Local features for validating config and testing CircleCI jobs
 
-### Host Desktop Requirements
+## Host Machine
+
+## Desktop Requirements
 
 No other mandatory software required to be installed on the desktop except for `vagrant` which provides a consistent developer desktop.  The [getting started](https://www.vagrantup.com/intro) have the details on the installation and getting started with `vagrant`.
+
+The `.vscode` folder has intentionally been committed to the repo so that convience lauches are immedaitely available as required.  However it is not manadatory to use VSCode.
 
 ### Vagrant Command
 
@@ -94,23 +100,17 @@ vagrant destroy
 
 ## Git Configuration
 
-Git configuration is difficult to fully automate securely.  Currently configuration is semi automated.
-
-Once the Vagrant VM has been provision there will be further steps to configure GPG keys, please review the following documentation to create and config these.
-
-* [Generating GPG Keys](https://help.github.com/en/github/authenticating-to-github/generating-a-new-gpg-key)
-* [Add GPG Keys to Github](https://help.github.com/en/github/authenticating-to-github/)adding-a-new-gpg-key-to-your-github-account)
-
-Generate the SSH key
-`ssh-keygen -t rsa -C "jonathan.fenwick@delineate.io"`
+Git configuration is difficult to fully automate.  Currently configuration is semi automated.  For now the SSH key is copied from the host to the guest VM to replicate the host user identity when interacting with `git`.  There maybe a better way so all proposals are welcome!
 
 ## Useful Scripts
 
 The following documented scripts have been provided for convience to aid development rather than hand crafting repetitive commands.
 
-### Qualiy Script
+### Container Script
 
-The `./dev/services/quality.sh $SERVICE` script performs a series of steps that can be run by developers to validate the quality of a specific service.  It does thios by running a range of tools and highlighting any issues.
+The `./dev/services/container.sh $SERVICE` script performs a series of steps that can be run by developers to validate the quality of a specific service container.
+
+The script runs the following steps:
 
 * Static code analysis using [staticcheck](https://staticcheck.io/)
 * Runs unit tests implemented using [go test](https://golang.org/pkg/cmd/go/internal/test/)

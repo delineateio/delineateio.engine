@@ -39,7 +39,7 @@
 
    - name: Start Postgres 11.6 Container
      docker_container:
-      name: database-dev
+      name: database-debug
       image: postgres:11.6
       state: started
       ports:

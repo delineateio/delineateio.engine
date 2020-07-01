@@ -70,6 +70,8 @@
      register: kube_config
      become_user: vagrant
 
+   # TODO: Warnings are shown here as now using specific
+   # file and directory modules
    - name: Create .kube Directory
      when: kube_config.stat.exists == false
      command: mkdir -p ~/.kube
@@ -80,23 +82,25 @@
      command: chown -f -R vagrant /home/vagrant/.kube
 
    # TODO: there are ugly paths!
+   # FIXME: An error occurs here as it can't seem to find the file
    - name: Add Local Cluster
      when: kube_config.stat.exists == false
      command: microk8s kubectl config view --raw > /home/vagrant/.kube/config
+     become_user: vagrant
 
    - name: Rename Local Cluster
      when: kube_config.stat.exists == false
      command: kubectl config rename-context microk8s local
      become_user: vagrant
 
-   - name: Add Staging Cluster
+   - name: Add Dev Cluster
      when: kube_config.stat.exists == false
      command: gcloud container clusters get-credentials ${GCP_CLUSTER_NAME}
      become_user: vagrant
 
-   - name: Rename Staging Cluster
+   - name: Rename Dev Cluster
      when: kube_config.stat.exists == false
-     shell: kubectl config rename-context $(kubectl config current-context) staging
+     shell: kubectl config rename-context $(kubectl config current-context) dev
      become_user: vagrant
 
    - name: Configure Docker
@@ -119,7 +123,6 @@
           --docker-password="$(cat ${GOOGLE_APPLICATION_CREDENTIALS})"
           --docker-email=${GCP_SERVICE_ACCOUNT}
           --dry-run -o yaml | kubectl replace -f -
-
         kubectl patch serviceaccount default \
           -p '{"imagePullSecrets": [{"name": "gcr-json-key"}]}'
      become_user: vagrant

@@ -3,12 +3,7 @@ kind: Config
 build:
   artifacts:
   - image: customers
-    # TODO: Docker build args is only supported beta
-    #docker:
-    #  buildArgs:
-    #    - MAINTAINER=jonathan.fenwick@delineate.io
-    #    - BUILD_DATE=2020-06-15T19:23:05Z
-    #    - VCS_REF=039f80a
+
 test:
   - image: customers
     structureTests:
@@ -18,11 +13,7 @@ deploy:
     manifests:
       - k8s/*
 profiles:
-- name: local
-  activation:
-    - kubeContext: local
-      command: dev
-- name: staging
-  activation:
-    - kubeContext: staging
-      command: run
+- name: local # Local k8s
+- name: dev # Unrestricted Cloud dev env
+- name: staging # Only via the pipeline
+- name: prod # Only via the pipeline

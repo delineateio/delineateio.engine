@@ -10,19 +10,18 @@ PATH=$HOME/go/bin:$PATH
 PATH=$HOME/.local/bin:$PATH # Apps Pip3 modules
 
 # Sets script wide colours
-# shellcheck disable=SC2034
+# shellcheck disable=SC2155
+export START="$(tput setaf 3)"
+# shellcheck disable=SC2155
+export COMPLETE="$(tput setaf 2)"
+# shellcheck disable=SC2155
+export DETAIL="$(tput setaf 6)"
+# shellcheck disable=SC2155
+export RESET="$(tput sgr0)"
 
-START=$(tput setaf 3)
-export START
-
-COMPLETE=$(tput setaf 2)
-export COMPLETE
-
-DETAIL=$(tput setaf 6)
-export DETAIL
-
-RESET=$(tput sgr0)
-export RESET
+# Defaults - enable compiled app
+export ENV=debug
+export LOCATION=../config
 
 # Starts SSH sessions in the project folder and enables scripts
 cd ~/project || return

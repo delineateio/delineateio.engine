@@ -1,0 +1,7 @@
+roles/compute.admin
+roles/container.clusterAdmin
+roles/container.clusterViewer
+roles/container.developer
+roles/iam.serviceAccountUser
+roles/storage.admin
+roles/storage.objectViewer

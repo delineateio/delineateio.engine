@@ -19,18 +19,18 @@ Vagrant.configure("2") do |config|
   # changes the default sync
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/home/vagrant/project"
-  config.vm.synced_folder "./ansible/files", "/files", owner: "root", group: "root"
+  config.vm.synced_folder "./ansible/general/files", "/files", owner: "root", group: "root"
 
   # copies the default .git files
-  # config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa", run: "always"
-  # config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub", run: "always"
+  config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa", run: "always"
+  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub", run: "always"
 
   ansible_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
       ansible.provisioning_path = ansible_provisioning_path
       ansible.version           = ansible_version
       ansible.verbose           = ansible_verbose
-      ansible.playbook          = "/home/vagrant/project/ansible/#{playbook}.yml"
+      ansible.playbook          = "/home/vagrant/project/ansible/general/#{playbook}.yml"
     end
   end
 

@@ -9,8 +9,8 @@ jobs:
     steps:
       - checkout
       - run: echo $GCP_KEY >> /gcp.json
-      - run: cd ./ops && terraform init -backend=true
-      - run: cd ./ops && terraform apply -lock=true -refresh=true -auto-approve
+      - run: cd ./ops/cloud && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
+      - run: cd ./ops/cloud && terraform apply -var="gcp_project=${GCP_PROJECT}" -lock=true -refresh=true -auto-approve
 
 workflows:
   version: 2

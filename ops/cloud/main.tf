@@ -4,7 +4,6 @@ terraform {
     google = "3.28"
   }
   backend "gcs" {
-    bucket = "io-delineate-staging"
     prefix = "terraform/state"
   }
 }
