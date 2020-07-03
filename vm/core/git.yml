@@ -17,7 +17,7 @@
      when: gitignore_global.stat.exists == false
      copy:
       remote_src: no
-      src: /files/.gitignore_global
+      src: ./files/.gitignore_global
       dest: ~/.gitignore_global
 
    - name: Check for ~/.gitconfig
@@ -28,8 +28,6 @@
      when: gitconfig.stat.exists == false
      command: "git config --global {{ item }}"
      with_items:
-      - user.name ${GIT_NAME}
-      - user.email ${GIT_EMAIL}
       - core.editor nano
       - core.excludesfile ~/.gitignore_global
       - commit.template ~/.gitmessage.txt
@@ -42,7 +40,7 @@
      when: gitmessage.stat.exists == false
      copy:
       remote_src: yes
-      src: /files/.gitmessage.txt
+      src: ./files/.gitmessage.txt
       dest: ~/.gitmessage.txt
 
    - name: Install Pre-Commit Pip
@@ -60,6 +58,3 @@
    - name: Get Secrets Basline
      when: secrets_baseline.stat.exists == false
      command: detect-secrets scan > .secrets.baseline
-
-   - name: "Install Git Hooks"
-     command: pre-commit install

@@ -1,0 +1,28 @@
+---
+- name: Docker
+  connection: local
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+
+   - name: Start Postgres 11.6 Container
+     docker_container:
+      name: database-debug
+      image: postgres:11.6
+      state: started
+      ports:
+        - 5432:5432
+      env:
+        POSTGRES_PASSWORD: "postgres"
+     become_user: vagrant
+
+   - name: Docker Prune Job
+     cron:
+      name: docker prune
+      hour: "02"
+      job: docker system prune -f
+      cron_file: docker_prune
+      user: vagrant

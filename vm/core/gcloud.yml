@@ -1,0 +1,47 @@
+---
+- name: GCloud
+  connection: local
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+
+   # This needs to be locked to a specific version - this could drift!
+   # https://github.com/ansible/role-install-gcloud
+   - name: Install GCloud
+     when: ansible_local.gcloud.installed == false
+     shell: |
+        cd ~/
+        curl https://sdk.cloud.google.com > install.sh
+        bash install.sh --disable-prompts
+     become_user: vagrant
+     args:
+      warn: no
+
+   # install via gcloud for version alignment
+   - name: Install Skaffold
+     when: ansible_local.skaffold.installed == false
+     command: gcloud components install skaffold --quiet
+     become_user: vagrant
+     args:
+      warn: no
+
+   - name: Install Structure Test
+     when: ansible_local.structure.installed == false
+     shell: |
+      cd ~/
+      curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+      chmod +x container-structure-test-linux-amd64
+      mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+     args:
+      warn: no
+
+   # install via kubectl for version alignment
+   - name: Install Kubectl
+     when: ansible_local.kubectl.installed == false
+     command: gcloud components install kubectl --quiet
+     become_user: vagrant
+     args:
+      warn: no

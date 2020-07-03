@@ -1,0 +1,24 @@
+---
+- name: Profile
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    sudors:
+      vagrant
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  become_user: vagrant
+  tasks:
+
+   - name: Check for ~/bash_profile
+     local_action: stat path=~/.bash_profile
+     register: profile
+
+   - name: Adds Bash Profile
+     when: ansible_local.profile.exists == false
+     copy:
+      remote_src: yes
+      src: ~/project/vm/core/files/.bash_profile
+      dest: ~/.bash_profile
+     become_user: vagrant

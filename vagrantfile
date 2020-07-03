@@ -1,9 +1,9 @@
 Vagrant.require_version "=2.2.9"
-
-ansible_provisioning_path = "/home/vagrant"
 ansible_version   = "2.9.10"
 ansible_verbose   = false
-ansible_playbooks = ["bootstrap","facts","profile","docker","microk8s","gcloud","go","cli","git"]
+ansible_home      = "/home/vagrant/project/vm"
+core_playbooks    = ["bootstrap","profile","facts","docker","microk8s","gcloud","go","cli","git"]
+config_playbooks  = ["profile","docker","microk8s","gcloud","git"]
 
 Vagrant.configure("2") do |config|
 
@@ -19,20 +19,28 @@ Vagrant.configure("2") do |config|
   # changes the default sync
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/home/vagrant/project"
-  config.vm.synced_folder "./ansible/general/files", "/files", owner: "root", group: "root"
 
-  # copies the default .git files
-  config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa", run: "always"
-  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub", run: "always"
-
-  ansible_playbooks.each do |playbook|
+  core_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
-      ansible.provisioning_path = ansible_provisioning_path
+      ansible.provisioning_path = "#{ansible_home}/core"
       ansible.version           = ansible_version
       ansible.verbose           = ansible_verbose
-      ansible.playbook          = "/home/vagrant/project/ansible/general/#{playbook}.yml"
+      ansible.playbook          = "#{playbook}.yml"
     end
   end
+
+  config_playbooks.each do |playbook|
+    config.vm.provision "ansible_local" do |ansible|
+      ansible.provisioning_path = "#{ansible_home}/config"
+      ansible.version           = ansible_version
+      ansible.verbose           = ansible_verbose
+      ansible.playbook          = "#{playbook}.yml"
+    end
+  end
+
+  # copies the ssh keys
+  config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa", run: "always"
+  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub", run: "always"
 
   # Postgres - enables debug from host to container inside VM
   config.vm.network "forwarded_port", guest: 5432, host: 5432

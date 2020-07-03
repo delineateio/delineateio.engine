@@ -1,0 +1,15 @@
+---
+- name: Microk8s
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+
+   - name: Enable Microk8s Services
+     command: "microk8s enable {{ item }}"
+     with_items:
+      - registry
+      - dns

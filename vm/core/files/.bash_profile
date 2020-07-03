@@ -29,5 +29,3 @@ cd ~/project || return
 # TODO: This is messy - ideally done by provisioning!
 # shellcheck disable=SC2046
 chmod +x $(find . -type f -name "*.sh")
-
-clear

@@ -1,0 +1,19 @@
+---
+- name: Git
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  become_user: vagrant
+  tasks:
+
+   - name: "Configure Git Global"
+     command: "git config --global {{ item }}"
+     with_items:
+      - user.name ${GIT_NAME}
+      - user.email ${GIT_EMAIL}
+
+   - name: "Install Git Hooks"
+     command: pre-commit install

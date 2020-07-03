@@ -8,18 +8,6 @@
   become: true
   tasks:
 
-   # This needs to be locked to a specific version - this could drift!
-   # https://github.com/ansible/role-install-gcloud
-   - name: Install GCloud
-     when: ansible_local.gcloud.installed == false
-     shell: |
-        cd ~/
-        curl https://sdk.cloud.google.com > install.sh
-        bash install.sh --disable-prompts
-     become_user: vagrant
-     args:
-      warn: no
-
    - name: Authenticate GCloud
      shell: |
        gcloud auth activate-service-account \
@@ -39,53 +27,25 @@
      args:
       warn: no
 
-   # install via gcloud for version alignment
-   - name: Install Skaffold
-     when: ansible_local.skaffold.installed == false
-     command: gcloud components install skaffold --quiet
-     become_user: vagrant
-     args:
-      warn: no
-
-   - name: Install Structure Test
-     when: ansible_local.structure.installed == false
-     shell: |
-      cd ~/
-      curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
-      chmod +x container-structure-test-linux-amd64
-      mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
-     args:
-      warn: no
-
-   # install via kubectl for version alignment
-   - name: Install Kubectl
-     when: ansible_local.kubectl.installed == false
-     command: gcloud components install kubectl --quiet
-     become_user: vagrant
-     args:
-      warn: no
-
    - name: Check for ~/.kube/config
      local_action: stat path=~/.kube/config
      register: kube_config
      become_user: vagrant
 
-   # TODO: Warnings are shown here as now using specific
-   # file and directory modules
    - name: Create .kube Directory
      when: kube_config.stat.exists == false
-     command: mkdir -p ~/.kube
-     become_user: vagrant
-
-   - name: Change .kube Permissions
-     when: kube_config.stat.exists == false
-     command: chown -f -R vagrant /home/vagrant/.kube
+     file:
+       path: ~/.kube
+       state: directory
+       owner: vagrant
+       mode: '0755'
 
    # TODO: there are ugly paths!
    # FIXME: An error occurs here as it can't seem to find the file
    - name: Add Local Cluster
      when: kube_config.stat.exists == false
-     command: microk8s kubectl config view --raw > /home/vagrant/.kube/config
+     shell: |
+      microk8s kubectl config view --raw > ~/.kube/config
      become_user: vagrant
 
    - name: Rename Local Cluster
@@ -114,6 +74,7 @@
       warn: no
 
   # https://blog.container-solutions.com/using-google-container-registry-with-kubernetes
+  # TODO: This should be moved to terraform
    - name: Authorise Cluster Pull
      shell: |
         kubectl config use-context cloud
