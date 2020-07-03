@@ -7,6 +7,9 @@ import (
 	"github.com/fvbock/endless"
 )
 
+const defaultRead = 5
+const defaultWrite = 5
+
 // TimeOuts represents the server timeout config
 type TimeOuts struct {
 	Read   time.Duration
@@ -15,22 +18,19 @@ type TimeOuts struct {
 }
 
 func readTimeOuts() TimeOuts {
-
 	return TimeOuts{
-		Read:   c.GetDuration("server.timeouts.read", 5*time.Second),
-		Write:  c.GetDuration("server.timeouts.write", 5*time.Second),
+		Read:   c.GetDuration("server.timeouts.read", defaultRead*time.Second),
+		Write:  c.GetDuration("server.timeouts.write", defaultWrite*time.Second),
 		Hammer: c.GetDuration("server.timeouts.hammer", time.Minute),
 	}
 }
 
 func updateTimeOuts(timeOuts TimeOuts) {
-
 	endless.DefaultReadTimeOut = timeOuts.Read
 	endless.DefaultWriteTimeOut = timeOuts.Write
 	endless.DefaultHammerTime = timeOuts.Hammer
 }
 
 func setTimeOuts() {
-
 	updateTimeOuts(readTimeOuts())
 }

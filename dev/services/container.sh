@@ -17,32 +17,6 @@ echo "port:     ${DETAIL}${PORT}${RESET}"
 echo "image:    ${DETAIL}${IMAGE_NAME}${RESET}"
 echo
 
-cd "$FOLDER/src"
-
-# Security test
-echo "${START}Go static code analysis started...${RESET}"
-staticcheck ./...
-echo "${COMPLETE}Go static code analysis completed${RESET}"
-echo
-
-# Functional test
-echo "${START}Go unit tests started...${RESET}"
-go test -run TestUT ./...
-echo "${COMPLETE}Go unit tests completed${RESET}"
-echo
-
-# Functional test
-echo "${START}Go http tests started...${RESET}"
-go test -run TestHTTP ./...
-echo "${COMPLETE}Go http tests completed${RESET}"
-echo
-
-# Security test
-echo "${START}Go security tests started...${RESET}"
-gosec -quiet ./...
-echo "${COMPLETE}Go security tests completed${RESET}"
-echo
-
 cd "$FOLDER"
 
 # Builds and runs the container

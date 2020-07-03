@@ -1,5 +1,13 @@
 repos:
 
+- repo: https://github.com/tekwizely/pre-commit-golang
+  rev: master
+  hooks:
+  - id: go-test-mod
+    name: Test Go
+  - id: golangci-lint-mod
+    name: Lint Go
+
 - repo: https://github.com/syntaqx/git-hooks
   rev: v0.0.16
   hooks:

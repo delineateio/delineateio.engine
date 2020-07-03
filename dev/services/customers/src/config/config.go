@@ -15,8 +15,7 @@ type IConfigurator interface {
 }
 
 // NewConfigurator gets a new production configurator
-func NewConfigurator(env string, location string) *Configurator {
-
+func NewConfigurator(env, location string) *Configurator {
 	if env == "" {
 		env = "prod"
 	}
@@ -41,13 +40,11 @@ type Configurator struct {
 
 // Load loads without a callback
 func (c *Configurator) Load() {
-
 	c.LoadWithCallback(nil)
 }
 
 // LoadWithCallback loads up the configuration from the sources
 func (c *Configurator) LoadWithCallback(reload func(in fsnotify.Event)) {
-
 	viper.SetConfigType("yml")
 	viper.SetConfigName(c.Env)
 	viper.AddConfigPath(c.Location)
@@ -55,10 +52,9 @@ func (c *Configurator) LoadWithCallback(reload func(in fsnotify.Event)) {
 	// Adds the func for callback (if provided)
 	viper.WatchConfig()
 	if reload != nil {
-
 		viper.OnConfigChange(reload)
 
-		//This will use the new log level that has been set
+		// This will use the new log level that has been set
 		l.Info("configuration.reload", "the configiration has been reload")
 	}
 
@@ -71,7 +67,6 @@ func (c *Configurator) LoadWithCallback(reload func(in fsnotify.Event)) {
 
 // GetBool gets the boolean value or defaults as required
 func GetBool(key string, defaultValue bool) bool {
-
 	if viper.IsSet(key) {
 		raw := viper.GetString(key)
 		value, err := strconv.ParseBool(raw)
@@ -87,8 +82,7 @@ func GetBool(key string, defaultValue bool) bool {
 }
 
 // GetString gets the value from Viper
-func GetString(key string, defaultValue string) string {
-
+func GetString(key, defaultValue string) string {
 	if viper.IsSet(key) {
 		return viper.GetString(key)
 	}
@@ -99,7 +93,6 @@ func GetString(key string, defaultValue string) string {
 
 // GetInt gets the value from Viper
 func GetInt(key string, defaultNumber int) int {
-
 	if viper.IsSet(key) {
 		value := viper.GetString(key)
 		number, err := strconv.Atoi(value)
@@ -116,9 +109,8 @@ func GetInt(key string, defaultNumber int) int {
 }
 
 // GetDuration provides additional valiation on top of the standard library
-// because Viper returned zero duraction which could cause signficant performance issues
+// because Viper returned zero duraction which could cause significant performance issues
 func GetDuration(key string, defaultDuration time.Duration) time.Duration {
-
 	if viper.IsSet(key) {
 		value := viper.GetString(key)
 		duration, err := time.ParseDuration(value)
@@ -135,7 +127,6 @@ func GetDuration(key string, defaultDuration time.Duration) time.Duration {
 
 // GetUint gets the value from Viper
 func GetUint(key string, defaultNumber uint) uint {
-
 	if viper.IsSet(key) {
 		value := viper.GetString(key)
 		number, err := strconv.ParseUint(value, 10, 64)
@@ -152,6 +143,5 @@ func GetUint(key string, defaultNumber uint) uint {
 
 // Exists confirms if the the key exists
 func Exists(key string) bool {
-
 	return viper.IsSet(key)
 }

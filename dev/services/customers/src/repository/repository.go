@@ -18,6 +18,11 @@ import (
 
 // DefaultDBType is the default db type
 const DefaultDBType = "postgres"
+const defaultRetries = 3
+const defaultDelayMilliseconds = 500
+const defaultMaxIdle = 500
+const defaultMaxOpen = 50
+const defaultMaxLifetime = 60
 
 // IRepository for all repositories
 type IRepository interface {
@@ -52,25 +57,23 @@ type Info struct {
 
 // NewRepository returns production database access
 func NewRepository(name string) *Repository {
-
 	return &Repository{
 		Name:                  name,
 		DBTypeKey:             "db." + name + ".type",
 		DBConnectionStringKey: "db." + name + ".connection",
 		AllowedDBTypes:        []string{"postgres"},
 		DefaultDBType:         DefaultDBType,
-		Attempts:              c.GetUint("db."+name+".retries.attempts", 3),
-		Delay:                 c.GetDuration("db."+name+".retries.delay", 500*time.Millisecond),
-		MaxIdle:               c.GetInt("db."+name+".limits.maxIdle", 10),
-		MaxOpen:               c.GetInt("db."+name+".limits.maxOpen", 50),
-		MaxLifetime:           c.GetDuration("db."+name+".limits.maxLifetime", 60*time.Minute),
+		Attempts:              c.GetUint("db."+name+".retries.attempts", defaultRetries),
+		Delay:                 c.GetDuration("db."+name+".retries.delay", defaultDelayMilliseconds*time.Millisecond),
+		MaxIdle:               c.GetInt("db."+name+".limits.maxIdle", defaultMaxIdle),
+		MaxOpen:               c.GetInt("db."+name+".limits.maxOpen", defaultMaxOpen),
+		MaxLifetime:           c.GetDuration("db."+name+".limits.maxLifetime", defaultMaxLifetime*time.Minute),
 	}
 }
 
 // Default to postgres
 // Get the connection string
 // Get a value not in approved list (error)
-
 func (r *Repository) dbTypeAllowed(expect string, list []string) bool {
 	for _, current := range list {
 		if strings.EqualFold(expect, current) {
@@ -81,7 +84,6 @@ func (r *Repository) dbTypeAllowed(expect string, list []string) bool {
 }
 
 func (r *Repository) getDatabaseType() (string, error) {
-
 	var err error
 	dbType := c.GetString(r.DBTypeKey, DefaultDBType)
 
@@ -95,12 +97,11 @@ func (r *Repository) getDatabaseType() (string, error) {
 }
 
 func (r *Repository) getConnectionString() (string, error) {
-
 	var err error
 	// It's not really possible to default connection strings!
 	connectionString := c.GetString(r.DBConnectionStringKey, "")
 
-	if len(connectionString) == 0 {
+	if connectionString == "" {
 		err = errors.New("no connection string was provided")
 		l.Error("db.connection.error", err)
 	}
@@ -109,7 +110,6 @@ func (r *Repository) getConnectionString() (string, error) {
 }
 
 func (r *Repository) getInfo() (Info, error) {
-
 	dbType, err := r.getDatabaseType()
 	if err != nil {
 		return Info{}, err
@@ -134,7 +134,6 @@ func (r *Repository) getInfo() (Info, error) {
 
 // Ping pings the underlying database to ensure it's contactable
 func (r *Repository) Ping() error {
-
 	info, err := r.getInfo()
 	if err != nil {
 		return err
@@ -154,7 +153,6 @@ func (r *Repository) Ping() error {
 
 // Ensures that a func is set to open the DB
 func (r *Repository) setDB(info Info) {
-
 	// Enables the replacing of the underlying DB connection
 	if r.SetDBFunc == nil {
 		r.SetDBFunc = func() (*gorm.DB, error) {
@@ -165,7 +163,6 @@ func (r *Repository) setDB(info Info) {
 
 // Open the database and sets the underlying configuration
 func (r *Repository) Open() error {
-
 	info, err := r.getInfo()
 	if err != nil {
 		return err
@@ -176,12 +173,11 @@ func (r *Repository) Open() error {
 
 	err = retry.Do(
 		func() error {
-			r.Info.Tries = r.Info.Tries + 1
+			r.Info.Tries++
 			r.Database, err = r.SetDBFunc()
 			if err != nil {
 				return err
 			}
-			// defer r.Database.Close()
 			return nil
 		},
 		retry.Attempts(r.Attempts),
@@ -202,7 +198,6 @@ func (r *Repository) Open() error {
 
 // Migrate placeholder for service specific migration
 func (r *Repository) Migrate() error {
-
 	err := errors.New("migrate is not implemneted in the base implemenation of respositor")
 	l.Error("db.migrate.error", err)
 	return err
@@ -210,7 +205,6 @@ func (r *Repository) Migrate() error {
 
 // Close the DB connection
 func (r *Repository) Close() error {
-
 	err := r.Database.Close()
 	if err != nil {
 		l.Error("db.close.error", err)

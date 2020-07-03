@@ -9,7 +9,6 @@ import (
 
 // NewMonitor access the monitors
 func NewMonitor() *Monitor {
-
 	return &Monitor{}
 }
 
@@ -24,11 +23,9 @@ type MonitorStatus struct {
 	Failed       bool
 }
 
-// TODO: This is bleeding the underlying interface
-
 // AddCheck adds checkers that implement IChecker dynamically to list
+// TODO: This is bleeding the underlying interface
 func (m *Monitor) AddCheck(name string, interval time.Duration, fatal bool, config h.Config) {
-
 	// Creates the check if required
 	if m.health == nil {
 		m.health = h.New()
@@ -53,7 +50,6 @@ func (m *Monitor) AddCheck(name string, interval time.Duration, fatal bool, conf
 
 // GetStatus returns the status of the monitor
 func (m *Monitor) GetStatus() MonitorStatus {
-
 	return MonitorStatus{
 		IsMonitoring: true,
 		Failed:       false,

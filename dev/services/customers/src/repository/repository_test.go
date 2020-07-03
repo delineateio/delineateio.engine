@@ -10,7 +10,6 @@ import (
 )
 
 func loadUnitTestConfig() {
-
 	var configurator = c.Configurator{
 		Env:      "repository",
 		Location: "../../tests",
@@ -19,9 +18,7 @@ func loadUnitTestConfig() {
 }
 
 func TestUTDefaultDatabaseType(t *testing.T) {
-
 	r := NewRepository("missing")
-
 	dbType, err := r.getDatabaseType()
 
 	assert.Equal(t, dbType, DefaultDBType)
@@ -29,53 +26,45 @@ func TestUTDefaultDatabaseType(t *testing.T) {
 }
 
 func TestUTGetConfigDatabaseType(t *testing.T) {
-
 	loadUnitTestConfig()
-
 	r := NewRepository("mysql")
 	r.AllowedDBTypes = []string{DefaultDBType, "mysql"}
-
 	dbType, err := r.getDatabaseType()
+
 	assert.NoError(t, err)
 	assert.Equal(t, dbType, "mysql")
 }
 
 func TestUTDBTypeNotAllowed(t *testing.T) {
-
 	loadUnitTestConfig()
-
 	r := NewRepository("sqllite")
 	r.AllowedDBTypes = []string{DefaultDBType, "mysql"}
-
 	dbType, err := r.getDatabaseType()
+
 	assert.Error(t, err)
 	assert.Equal(t, dbType, DefaultDBType)
 }
 
 func TestUTConnectionStringNotSet(t *testing.T) {
-
 	r := NewRepository("postgres")
 	r.DBConnectionStringKey = ""
-
 	connection, err := r.getConnectionString()
+
 	assert.Error(t, err)
 	assert.Equal(t, connection, "")
 }
 
 func TestUTGetConfigConnectionString(t *testing.T) {
-
 	loadUnitTestConfig()
-
 	r := NewRepository("postgres")
 	connection, err := r.getConnectionString()
+
 	assert.NoError(t, err)
 	assert.Equal(t, connection, "postgres://postgres:postgres@postgres/postgres")
 }
 
 func TestUTOpenFailsNoDBType(t *testing.T) {
-
 	loadUnitTestConfig()
-
 	r := NewRepository("postgres")
 	r.DBTypeKey = ""
 
@@ -84,23 +73,18 @@ func TestUTOpenFailsNoDBType(t *testing.T) {
 }
 
 func TestUTOpenFailsNoDBConnectionString(t *testing.T) {
-
 	loadUnitTestConfig()
-
 	r := NewRepository("postgres")
 	r.DBConnectionStringKey = ""
-
 	err := r.Open()
+
 	assert.Error(t, err)
 }
 
 func TestUTOpenTryAttempts(t *testing.T) {
-
 	loadUnitTestConfig()
-
 	r := NewRepository("postgres")
 	assert.Equal(t, r.Attempts, uint(3))
-
 	// Changes from the default
 	attempts := 2
 	r.Attempts = uint(attempts)
@@ -110,13 +94,9 @@ func TestUTOpenTryAttempts(t *testing.T) {
 }
 
 func TestUTMainDBFuncs(t *testing.T) {
-
+	// Sets up the base repository and overrides with mock
 	loadUnitTestConfig()
-
-	// Sets up the base repository and overrides
 	r := NewRepository("postgres")
-
-	// Creates the mock for testing purposes
 	db, mock, err := sqlmock.New()
 
 	assert.NoError(t, err) // Asserts there is no error

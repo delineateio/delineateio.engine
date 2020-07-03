@@ -17,16 +17,14 @@ type Customer struct {
 }
 
 func addCustomer(request *s.Request, response *s.Response) {
-
 	customer := Customer{}
-
 	err := mapstructure.Decode(request.Body, &customer)
 	if err != nil {
 		l.Error("", err)
 		response.Code = http.StatusBadRequest
 	}
 
-	err = NewCustomerRepository().CreateCustomer(customer)
+	err = NewCustomerRepository().CreateCustomer(&customer)
 	if err != nil {
 		response.Code = http.StatusServiceUnavailable
 		return

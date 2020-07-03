@@ -14,7 +14,7 @@ import (
 
 // TestCustomerRoute for testing the simple healthz
 func TestHTTPCustomerRouteMockDB(t *testing.T) {
-
+	// Creates the repo
 	r := NewCustomerRepository()
 
 	// Creates the mock for testing purposes

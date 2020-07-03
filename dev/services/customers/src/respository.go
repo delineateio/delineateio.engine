@@ -12,29 +12,27 @@ type CustomerRepository struct {
 
 // NewCustomerRepository returns production database access
 func NewCustomerRepository() *CustomerRepository {
-
 	return &CustomerRepository{
 		core: r.NewRepository("customers"),
 	}
 }
 
 // Migrate the DB to the latest schema
-func (r *CustomerRepository) Migrate() error {
-
-	err := r.core.Open()
+func (customers *CustomerRepository) Migrate() error {
+	err := customers.core.Open()
 	if err != nil {
 		return err
 	}
 
-	err = r.core.Database.AutoMigrate(&Customer{}).Error
+	err = customers.core.Database.AutoMigrate(&Customer{}).Error
 	if err != nil {
 		// better to report the earlier error
 		l.Error("db.migrate.error", err)
-		_ = r.core.Close()
+		_ = customers.core.Close()
 		return err
 	}
 
-	err = r.core.Close()
+	err = customers.core.Close()
 	if err != nil {
 		return err
 	}
@@ -44,19 +42,18 @@ func (r *CustomerRepository) Migrate() error {
 }
 
 // CreateCustomer adds the customer object to the database
-func (r *CustomerRepository) CreateCustomer(customer Customer) error {
-
-	err := r.Open()
+func (customers *CustomerRepository) CreateCustomer(customer *Customer) error {
+	err := customers.Open()
 	if err != nil {
 		return err
 	}
 
-	err = r.core.Database.Create(&customer).Error
+	err = customers.core.Database.Create(&customer).Error
 	if err != nil {
 		l.Error("customer.create", err)
 	}
 
-	err = r.Close()
+	err = customers.Close()
 	if err != nil {
 		return err
 	}
@@ -65,16 +62,16 @@ func (r *CustomerRepository) CreateCustomer(customer Customer) error {
 }
 
 // Ping wrapper around the core implementation
-func (r *CustomerRepository) Ping() error {
-	return r.core.Ping()
+func (customers *CustomerRepository) Ping() error {
+	return customers.core.Ping()
 }
 
 // Open wrapper around the core implementation
-func (r *CustomerRepository) Open() error {
-	return r.core.Open()
+func (customers *CustomerRepository) Open() error {
+	return customers.core.Open()
 }
 
 // Close wrapper around the core implementation
-func (r *CustomerRepository) Close() error {
-	return r.core.Close()
+func (customers *CustomerRepository) Close() error {
+	return customers.core.Close()
 }

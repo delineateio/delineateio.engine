@@ -23,7 +23,6 @@ type command func(request *Request, response *Response)
 
 // Dispatch initiates and handles the request and response
 func Dispatch(ctx *gin.Context, command command) {
-
 	request := Request{
 		Body: make(map[string]interface{}),
 	}
@@ -38,7 +37,7 @@ func Dispatch(ctx *gin.Context, command command) {
 	var response Response
 	command(&request, &response)
 
-	//Adds the headers
+	// Adds the headers
 	ctx.Header("Content-Type", "application/json")
 
 	// Only writes the body

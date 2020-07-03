@@ -11,16 +11,15 @@ import (
 
 // AddHTTPCheck adds a check to a specific HTTP end point
 func (m *Monitor) AddHTTPCheck(name string, interval time.Duration, fatal bool, rawurl string) {
-
 	// Create a checker
 	var check *checkers.HTTP
-	url, err := url.Parse(rawurl)
+	value, err := url.Parse(rawurl)
 	if err != nil {
 		l.Error("healthcheck.http.url.error", err)
 	}
 
 	check, err = checkers.NewHTTP(&checkers.HTTPConfig{
-		URL: url,
+		URL: value,
 	})
 	if err != nil {
 		l.Error("healthcheck.http.add.error", err)

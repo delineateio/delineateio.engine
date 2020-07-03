@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	server := s.NewServer(getRoutes, NewCustomerRepository())
 	server.Env = os.Getenv("ENV")
 	server.Location = os.Getenv("LOCATION")
@@ -17,7 +16,6 @@ func main() {
 }
 
 func getRoutes() []gin.RouteInfo {
-
 	return []gin.RouteInfo{
 		{
 			Method: "POST",
@@ -27,11 +25,4 @@ func getRoutes() []gin.RouteInfo {
 			},
 		},
 	}
-
-	//	v1 := router.Group("/v1")
-	//	{
-	//		v1.POST("/customer", func(ctx *gin.Context) {
-	//			s.Dispatch(ctx, addCustomer)
-	//		})
-	//	}
 }

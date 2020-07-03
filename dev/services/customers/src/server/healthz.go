@@ -10,9 +10,7 @@ import (
 // Healthz is the health check - the name is inspired by
 // a forgotten source that this is the naming conventions at Google
 func Healthz(request *Request, response *Response) {
-
 	status := h.NewMonitor().GetStatus()
-
 	l.Debug("healthcheck.ping", "Health check was called")
 
 	// If there are no checks configured then the service is good
