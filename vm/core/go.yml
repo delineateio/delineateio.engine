@@ -1,5 +1,5 @@
 ---
-- name: Go
+- name: Go Install
   connection: local
   gather_facts: true
   hosts: all
@@ -15,14 +15,15 @@
       classic: true
       state: present
 
-   - name: Install Gosec
-     snap:
-      name: gosec
-      channel: latest/stable
-      classic: true
-      state: present
+#   - name: Install Gosec
+#     snap:
+#      name: gosec
+#      channel: latest/stable
+#      classic: true
+#      state: present
 
    - name: Install golangci
+     when: ansible_local.golangci.installed == false
      shell: |
       curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0
      args:

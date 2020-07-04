@@ -1,5 +1,5 @@
 ---
-- name: Profile
+- name: Profile Install
   connection: local
   gather_facts: false
   hosts: all
@@ -11,12 +11,7 @@
   become_user: vagrant
   tasks:
 
-   - name: Check for ~/bash_profile
-     local_action: stat path=~/.bash_profile
-     register: profile
-
    - name: Adds Bash Profile
-     when: ansible_local.profile.exists == false
      copy:
       remote_src: yes
       src: ~/project/vm/core/files/.bash_profile

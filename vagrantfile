@@ -2,8 +2,10 @@ Vagrant.require_version "=2.2.9"
 ansible_version   = "2.9.10"
 ansible_verbose   = false
 ansible_home      = "/home/vagrant/project/vm"
-core_playbooks    = ["bootstrap","profile","facts","docker","microk8s","gcloud","go","cli","git"]
-config_playbooks  = ["profile","docker","microk8s","gcloud","git"]
+core_playbooks    = ["bootstrap","profile","facts","docker","k8s","gcloud","proxy","go","cli","git"]
+config_playbooks  = ["profile","docker","k8s","gcloud","proxy","git"]
+core_playbooks    = ["facts"]
+config_playbooks  = ["gcloud", "proxy"]
 
 Vagrant.configure("2") do |config|
 
@@ -44,5 +46,10 @@ Vagrant.configure("2") do |config|
 
   # Postgres - enables debug from host to container inside VM
   config.vm.network "forwarded_port", guest: 5432, host: 5432
+
+  # Octant - Provides visibility into the K8s cluster to help debugging
+  config.vm.network "forwarded_port", guest: 7777, host: 7777
+
+  # TODO - Add a reverse proxy so that single app port needs opening
 
 end

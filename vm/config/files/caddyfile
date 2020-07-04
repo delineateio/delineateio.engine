@@ -1,0 +1,13 @@
+localhost {
+
+  proxy /api backend:8080 {
+    websocket
+    transparent
+  }
+
+  log stdout
+  errors stderr
+
+  browse
+  gzip
+}

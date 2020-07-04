@@ -19,12 +19,19 @@ resource "google_container_cluster" "app_cluster" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
+  // TODO: Need to authorise networks
   master_auth {
-    username = ""
-    password = ""
 
     client_certificate_config {
       issue_client_certificate = false
+    }
+  }
+
+  // TODO: Can/should this be restricted to static IP?
+  master_authorized_networks_config {
+    cidr_blocks {
+      display_name = "a network"
+      cidr_block   = "0.0.0.0/0"
     }
   }
 
@@ -74,4 +81,48 @@ resource "google_container_node_pool" "app_cluster_nodes" {
       "https://www.googleapis.com/auth/monitoring",
     ]
   }
+}
+
+# Creates the service account to use when pulling images
+# https://www.terraform.io/docs/providers/google/r/google_service_account.html
+resource "google_service_account" "registry_service_account" {
+  account_id   = "registry"
+  display_name = "registry"
+}
+
+resource "google_project_iam_binding" "registry_iam_binding" {
+  role = "roles/storage.objectViewer"
+  members = [
+    "serviceAccount:${google_service_account.registry_service_account.email}"
+  ]
+}
+
+# Gets a service account key
+# https://www.terraform.io/docs/providers/google/r/google_service_account_key.html
+resource "google_service_account_key" "registry_key" {
+  service_account_id = google_service_account.registry_service_account.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}
+
+# Creates the required k8s Secret
+# https://www.terraform.io/docs/providers/kubernetes/r/secret.html
+resource "kubernetes_secret" "registry_secret" {
+  metadata {
+    name = google_service_account.registry_service_account.account_id
+  }
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      "auths" : {
+        "https://${var.gcp_registry}/${var.gcp_project}" : {
+          email    = google_service_account.registry_service_account.email
+          username = "_json_key"
+          password = trimspace(base64decode(google_service_account_key.registry_key.private_key))
+          auth     = base64encode(join(":", ["_json_key", base64decode(google_service_account_key.registry_key.private_key)]))
+        }
+      }
+    })
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
 }

@@ -1,5 +1,5 @@
 ---
-- name: GCloud
+- name: GCloud Config
   connection: local
   gather_facts: true
   hosts: all
@@ -15,57 +15,42 @@
         --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
         gcloud config set account ${GCP_SERVICE_ACCOUNT}
      become_user: vagrant
-     args:
-      warn: no
 
    - name: Configure GCloud
      shell: |
-       gcloud config set project ${GCP_PROJECT_ID}
+       gcloud config set project ${GCP_PROJECT}
        gcloud config set compute/region ${GCP_REGION}
        gcloud config set compute/zone ${GCP_ZONE}
      become_user: vagrant
-     args:
-      warn: no
-
-   - name: Check for ~/.kube/config
-     local_action: stat path=~/.kube/config
-     register: kube_config
-     become_user: vagrant
 
    - name: Create .kube Directory
-     when: kube_config.stat.exists == false
      file:
        path: ~/.kube
        state: directory
        owner: vagrant
        mode: '0755'
+     become_user: vagrant
 
-   # TODO: there are ugly paths!
-   # FIXME: An error occurs here as it can't seem to find the file
    - name: Add Local Cluster
-     when: kube_config.stat.exists == false
      shell: |
       microk8s kubectl config view --raw > ~/.kube/config
      become_user: vagrant
 
    - name: Rename Local Cluster
-     when: kube_config.stat.exists == false
      command: kubectl config rename-context microk8s local
      become_user: vagrant
 
    - name: Add Dev Cluster
-     when: kube_config.stat.exists == false
      command: gcloud container clusters get-credentials ${GCP_CLUSTER_NAME}
      become_user: vagrant
 
    - name: Rename Dev Cluster
-     when: kube_config.stat.exists == false
      shell: kubectl config rename-context $(kubectl config current-context) dev
      become_user: vagrant
 
    - name: Configure Docker
      shell: |
-       kubectl config use-context cloud
+       kubectl config use-context dev
        gcloud components install docker-credential-gcr -q
        gcloud auth configure-docker -q
        docker-credential-gcr configure-docker
@@ -73,19 +58,16 @@
      args:
       warn: no
 
-  # https://blog.container-solutions.com/using-google-container-registry-with-kubernetes
-  # TODO: This should be moved to terraform
-   - name: Authorise Cluster Pull
-     shell: |
-        kubectl config use-context cloud
-        kubectl create secret docker-registry \
-          gcr-json-key --docker-server=${GCP_REGISTRY} \
-          --docker-username=_json_key \
-          --docker-password="$(cat ${GOOGLE_APPLICATION_CREDENTIALS})"
-          --docker-email=${GCP_SERVICE_ACCOUNT}
-          --dry-run -o yaml | kubectl replace -f -
-        kubectl patch serviceaccount default \
-          -p '{"imagePullSecrets": [{"name": "gcr-json-key"}]}'
-     become_user: vagrant
-     args:
-      warn: no
+   - name: Add Octant Service
+     copy:
+      remote_src: yes
+      src: /home/vagrant/project/vm/config/services/octant.service
+      dest: /etc/systemd/system/octant.service
+      owner: root
+
+   - name: Start Octant Service
+     systemd:
+      name: octant.service
+      daemon_reload: yes
+      enabled: yes
+      state: started

@@ -19,3 +19,7 @@ variable "gcp_region" {
 variable "gcp_zone" {
   type = string
 }
+
+variable "gcp_registry" {
+  type = string
+}

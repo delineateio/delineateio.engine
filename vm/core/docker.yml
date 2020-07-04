@@ -1,5 +1,5 @@
 ---
-- name: Docker
+- name: Docker Install
   connection: local
   gather_facts: true
   hosts: all

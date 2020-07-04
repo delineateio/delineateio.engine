@@ -1,0 +1,38 @@
+---
+- name: Proxy
+  connection: local
+  gather_facts: false
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  tasks:
+
+   - name: Caddy Directory Permissions
+     file:
+       path: /etc/caddy
+       owner: root
+       group: root
+       mode: 0755
+       state: directory
+
+   - name: Copy Caddyfile
+     copy:
+      remote_src: yes
+      src: /home/vagrant/project/vm/config/files/caddyfile
+      dest: /etc/caddy/caddyfile
+      owner: root
+
+   - name: Add Caddy Service
+     copy:
+      remote_src: yes
+      src: /home/vagrant/project/vm/config/services/caddy.service
+      dest: /etc/systemd/system/caddy.service
+      owner: root
+
+   - name: Start Caddy Service
+     systemd:
+      name:  caddy.service
+      daemon_reload: yes
+      enabled: yes
+      state: started

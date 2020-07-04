@@ -5,3 +5,6 @@ roles/container.developer
 roles/iam.serviceAccountUser
 roles/storage.admin
 roles/storage.objectViewer
+roles/iam.serviceAccountCreator
+roles/iam.serviceAccountAdmin
+roles/iam.serviceAccountKeyAdmin

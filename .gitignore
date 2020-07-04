@@ -6,5 +6,5 @@
 .vscode/
 
 # files
-.todo
 .secrets.baseline
+hosts

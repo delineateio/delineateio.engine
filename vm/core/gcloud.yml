@@ -1,5 +1,5 @@
 ---
-- name: GCloud
+- name: GCloud Install
   connection: local
   gather_facts: true
   hosts: all

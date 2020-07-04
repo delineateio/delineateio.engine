@@ -1,5 +1,5 @@
 ---
-- name: Microk8s
+- name: k8s Config
   connection: local
   gather_facts: false
   hosts: all

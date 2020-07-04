@@ -34,6 +34,7 @@
        - nmap=7.60-1ubuntu5
        - rpm=4.14.1+dfsg1-2
        - apache2-utils=2.4.29-1ubuntu4.13
+       - libnss3-tools=2:3.35-2ubuntu2.8
       state: present
 
    - name: Install Npm

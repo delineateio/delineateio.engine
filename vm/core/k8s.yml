@@ -1,5 +1,5 @@
 ---
-- name: Microk8s
+- name: k8s Install
   connection: local
   gather_facts: false
   hosts: all
@@ -20,12 +20,9 @@
      shell: |
       usermod -a -G microk8s vagrant
       iptables -P FORWARD ACCEPT
-      echo '{"insecure-registries" : ["localhost:32000"]}' > /etc/docker/daemon.json
-     args:
-      warn: no
 
-   - name: Enable Microk8s Services
-     command: "microk8s enable {{ item }}"
-     with_items:
-      - registry
-      - dns
+# echo '{"insecure-registries" : ["localhost:32000"]}' > /etc/docker/daemon.json
+
+   - name: Install Octant
+     apt:
+      deb: https://github.com/vmware-tanzu/octant/releases/download/v0.13.1/octant_0.13.1_Linux-64bit.deb

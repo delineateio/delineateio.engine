@@ -1,7 +1,7 @@
 ---
-- name: Git
+- name: Git Install
   connection: local
-  gather_facts: false
+  gather_facts: true
   hosts: all
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -44,17 +44,10 @@
       dest: ~/.gitmessage.txt
 
    - name: Install Pre-Commit Pip
+     when: ansible_local.pre_commit.installed == false
      pip:
       name: pre-commit==2.5.1
 
    - name: Install Detect Secrets
      pip:
       name: detect-secrets==0.13.1
-
-   - name: Check for ~/.gitmessage.txt
-     local_action: stat path=~/.gitmessage.txt
-     register: secrets_baseline
-
-   - name: Get Secrets Basline
-     when: secrets_baseline.stat.exists == false
-     command: detect-secrets scan > .secrets.baseline

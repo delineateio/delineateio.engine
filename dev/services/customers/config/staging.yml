@@ -17,4 +17,4 @@ db:
       maxLifetime: 10m
     retries:
       attempts: 10
-      delay: 1s
+      delay: 3s
