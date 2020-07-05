@@ -1,14 +1,20 @@
-# Delineate Engine
-
-[![CircleCI](https://circleci.com/gh/delineateio/delineateio.engine.svg?style=shield)](https://circleci.com/gh/delineateio/delineateio.engine)
-[![codebeat badge](https://codebeat.co/badges/f382bda1-32b7-406a-b793-9ae515ae8e52)](https://codebeat.co/projects/github-com-delineateio-delineateio-engine-master)
-[![Github All Releases](https://img.shields.io/github/downloads/delineateio/delineateio.engine/total.svg)](https://github.com/delineateio/delineateio.engine/releases)
+<p align="center">
+  <img alt="delineate.io" src="./assets/logo.png" height="75" />
+  <h2 align="center">delineate.io</h2>
+  <p align="center">portray or describe (something) precisely.</p>
+</p>
 
 ## Purpose
 
-The purpose of this project is to provide core services for the delineate.io engine.
+Delineate is a platform for taking business ideas to end users without losing clarity of the orginal idea. This project will provide the core services for the delineate.io platform. Currently this repo only contains an example service which has been used to refine the developer workflow and tooling.
 
-Currently this repo only contains an example service which has been used to refine the developer workflow and tooling.
+## Badges
+
+[![CircleCI](https://circleci.com/gh/delineateio/delineateio.engine.svg?style=shield)](https://circleci.com/gh/delineateio/delineateio.engine)
+[![codebeat badge](https://codebeat.co/badges/f382bda1-32b7-406a-b793-9ae515ae8e52)](https://codebeat.co/projects/github-com-delineateio-delineateio-engine-master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/delineateio/delineateio.engine)](https://goreportcard.com/report/gtithub.com/delineateio/delineateio.engine)
+[![Github All Releases](https://img.shields.io/github/downloads/delineateio/delineateio.engine/total.svg)](https://github.com/delineateio/delineateio.engine/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Principles
 
@@ -24,9 +30,7 @@ Secrets are provisioned into the `vagrant` VM during Ansible provisioning, the f
 
 |Group      |File             |Env Variables      |Docs                                                      |
 |---        |---              |---                |---                                                       |
-|Cloudflare |cloudflare.env   |CLOUDFLARE_EMAIL   |[link](https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys)           |
-|           |                 |CLOUDFLARE_ZONE    |                                                          |
-|           |                 |CLOUDFLARE_TOKEN   |                                                          |
+|Cloudflare|cloudflare.env|CLOUDFLARE_EMAIL, CLOUDFLARE_ZONE, CLOUDFLARE_TOKEN|[link](https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys)           |
 |Snyk       |snyk.env         |SNYK_TOKEN         |[link](https://support.snyk.io/hc/en-us/articles/360004037557-Authentication-for-API)              |
 |Git        |git.env          |GIT_NAME           |                                                          |
 |           |                 |GIT_EMAIL          |                                                          |
@@ -37,7 +41,7 @@ Secrets are provisioned into the `vagrant` VM during Ansible provisioning, the f
 
 To make setup of the development environment as easy as possible a Hashicorp Vagrant file has been provided with an Ansible playbooks to install dependencies.  `vagrant` is the only mandatory pr-installed desktop software required to stand up a dev environment.
 
-*Please note that the `vagrantfile` contains specific configuration to run using VMWare provider, which is a commercial product.  This can be commented out if required, for example to use Virtualbox.*
+> Please note that the `vagrantfile` contains specific configuration to run using VMWare provider, which is a commercial product.  This can be commented out if required, for example to use Virtualbox.
 
 ### Installed Components
 
@@ -65,33 +69,7 @@ The `vagrantfile` ensures that the following components are installed and config
 
 To support shared identity between the host and the VM machine the standard SSH keys are replicated into the VM. To test authentication to `github` it is possible to use `ssh -T git@github.com` from inside the VM.
 
-## Useful Scripts
-
-### Container Script
-
-The `./dev/services/container.sh $SERVICE` script performs a series of steps that can be run by developers to validate the quality of a specific service container.
-
-The script runs the following steps:
-
-* Static code analysis using [staticcheck](https://staticcheck.io/)
-* Runs unit tests implemented using [go test](https://golang.org/pkg/cmd/go/internal/test/)
-* Runs HTTP tests implemented using [go test](https://golang.org/pkg/cmd/go/internal/test/)
-* Static code security scann is performed through [go sec](https://github.com/securego/gosec)
-* Container structure test using [structure tests](https://github.com/GoogleContainerTools/container-structure-test)
-* Container security scan using [snyk](https://snyk.io/)
-* Container security scan using [trivy](https://github.com/aquasecurity/trivy)
-
-### Up Script
-
-The `up` script provided at `./dev/stack/up.sh` uses `docker-compose` to stand up a lightweight stack for testing purposes.  Re-running the script will take down and they put up the stack.
-
-For the full documentation please refer to `docker` and the `docker-compose` [offical documentation](https://github.com/docker/compose).
-
-### Local Script
-
-The script provided at `./dev/services/local.sh $SERVICE` will switch to the local `microk8s` cluster and use `skaffold` to deploy the specified service.
-
-## Debugging
+## Debugging & Testing
 
 ### Postgres Database
 
@@ -107,3 +85,27 @@ systemctl enable $SERVICE
 systemctl start $SERVICE
 systemctl status $SERVICE
 ```
+
+### Container Script
+
+The `./dev/services/container.sh $SERVICE` script performs a series of steps that can be run by developers to validate the quality of a specific service container.
+
+The script runs the following steps:
+
+* Container structure test using [structure tests](https://github.com/GoogleContainerTools/container-structure-test)
+* Container security scan using [snyk](https://snyk.io/)
+* Container security scan using [trivy](https://github.com/aquasecurity/trivy)
+
+### Up Script
+
+The `up` script provided at `./dev/stack/up.sh` uses `docker-compose` to stand up a lightweight stack for testing purposes.  Re-running the script will take down and they put up the stack.
+
+For the full documentation please refer to `docker` and the `docker-compose` [offical documentation](https://github.com/docker/compose).
+
+### Local Script
+
+The script provided at `./dev/services/local.sh $SERVICE` will switch to the local `microk8s` cluster and use `skaffold` to deploy the specified service.
+
+### Dev Script
+
+The script provided at `./dev/services/dev.sh $SERVICE` will switch to the local `dev` cluster and use `skaffold` to deploy the specified service to the dev cloud environment.
