@@ -3,7 +3,6 @@
 .gcloud/
 .terraform/
 .vagrant/
-.vscode/
 
 # files
 .secrets.baseline
