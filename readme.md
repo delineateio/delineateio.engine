@@ -78,6 +78,8 @@ The `vagrantfile` ensures that the following components are installed and config
 
 To support shared identity between the host and the VM machine the standard SSH keys are replicated into the VM. To test authentication to `github` it is possible to use `ssh -T git@github.com` from inside the VM.
 
+## Debugging & Testing
+
 ### Postgres Database
 
 Debugging is undertaken from in the main from the host desktop using the developers IDE of choice. A postgres database runs inside the VM with port forwarding from the host
