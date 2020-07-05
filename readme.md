@@ -24,18 +24,7 @@ Delineate is a platform for taking business ideas to end users without losing cl
 * Separation is to be maintained between the install and configuration of the `vagrant` machine to ensure reuse of Asible playbooks across projects
 * Features will be delivered via configuration rather than scripts whenever possible
 
-## Secrets
-
-Secrets are provisioned into the `vagrant` VM during Ansible provisioning, the following secrets should be present in `./vm/config/.env`:
-
-|Group      |File             |Env Variables      |Docs                                                      |
-|---        |---              |---                |---                                                       |
-|Cloudflare|cloudflare.env|CLOUDFLARE_EMAIL, CLOUDFLARE_ZONE, CLOUDFLARE_TOKEN|[link](https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys)           |
-|Snyk       |snyk.env         |SNYK_TOKEN         |[link](https://support.snyk.io/hc/en-us/articles/360004037557-Authentication-for-API)              |
-|Git        |git.env          |GIT_NAME           |                                                          |
-|           |                 |GIT_EMAIL          |                                                          |
-
-## Hashicorp Vagrant
+## Desktop Setup
 
 ### Overview
 
@@ -43,33 +32,51 @@ To make setup of the development environment as easy as possible a Hashicorp Vag
 
 > Please note that the `vagrantfile` contains specific configuration to run using VMWare provider, which is a commercial product.  This can be commented out if required, for example to use Virtualbox.
 
+The IDE will be installed on host. Any IDE can be used although the `.vscode` directory has been committed tothe repo to enable sharing of settings between contributors.
+
+### Secrets
+
+Secrets are provisioned into the `vagrant` VM during Ansible provisioning, the following secrets should be present in `./vm/config/.env`:
+
+|Group|File|Env Variables|Docs|
+|---|---|---|---|
+|Cloudflare|cloudflare.env|CLOUDFLARE_EMAIL, CLOUDFLARE_ZONE, CLOUDFLARE_TOKEN|[link](https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys)|
+|Snyk|snyk.env|SNYK_TOKEN|[link](https://support.snyk.io/hc/en-us/articles/360004037557-Authentication-for-API)|
+|Git|git.env|GIT_NAME, GIT_EMAIL||
+
 ### Installed Components
 
 The `vagrantfile` ensures that the following components are installed and configured correct to provide a fully formed developer desktop.
 
-* [Microk8s](https://microk8s.io/) -> Local K8s cluster
-* [Docker](https://www.docker.com/) -> standard containerisation functionality
-* [Skaffold](https://skaffold.dev/) -> Support easier deployments to clusters
-* [Kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) -> Interact with local and cloud hosed clusters
-* [Httpie](https://httpie.org/) -> HTTP/S requests from the command line
-* [Snyk](https://snyk.io/) -> Container security platform
-* [Trivy](https://github.com/aquasecurity/trivy) -> Additional OSS container scanning
-* [Terraform](https://www.terraform.io/) - Provisioning of cloud infrastructure
-* [Packer](https://www.packer.io/) - Provisioning of cloud VM images
-* [gCloud](https://cloud.google.com/sdk) - Interact with Google Cloud Platform
-* [Go](https://golang.org/) - Core `golang` and associated libraries
-* [Git](https://git-scm.com/) -> Source code management
-* [yq](https://github.com/mikefarah/yq) -> Command line for working with `yaml`
-* [jq](https://stedolan.github.io/jq/) -> Command line for working with `json`
-* [Shellcheck](https://github.com/koalaman/shellcheck) -> Shell script static code analysis
-* [Siege](https://github.com/JoeDog/siege) -> Command line for loading basic load testing of HTTP endpoints
-* [CircleCI](https://circleci.com/docs/2.0/local-cli/) -> Local features for validating config and testing CircleCI jobs
+|Tool|Use|
+|---|---|
+|[Go](https://golang.org/)|Core `golang` and associated libraries
+|[golangci-lint](https://golangci-lint.run/)|Fast application of multiple `golang` linters|
+|[Git](https://git-scm.com/)|Source code management|
+|[pre-commit](https://pre-commit.com/)|Framework for using `git` hooks|
+|[Detect Secrets](https://github.com/Yelp/detect-secrets)|Integrates with `pre-commit` to mitigate secrets commits|
+|[yq](https://github.com/mikefarah/yq)|Command line for working with `yaml`|
+|[jq](https://stedolan.github.io/jq/)|Command line for working with `json`|
+|[Shellcheck](https://github.com/koalaman/shellcheck)|Shell script static code analysis|
+|[Siege](https://github.com/JoeDog/siege)|Command line for loading basic load testing of HTTP endpoints|
+|[Httpie](https://httpie.org/)|HTTP/S requests from the command line|
+|[Microk8s](https://microk8s.io/)|Local `k8s` cluster|
+[Octant](https://octant.dev/)|Provide visual insight into multiple `k8s` clusters|
+|[Docker](https://www.docker.com/)|Standard containerisation functionality|
+|[Skaffold](https://skaffold.dev/)|Support easier deployments to clusters|
+|[Kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)|Interact with local and cloud hosted `k8s` clusters|
+|[Image Structure Test](https://github.com/GoogleContainerTools/container-structure-test)|Test structure of images after Docker image builds|
+|[Snyk](https://snyk.io/)|Container security platform|
+|[Trivy](https://github.com/aquasecurity/trivy)|Additional OSS container scanning from Aqua security|
+|[gCloud](https://cloud.google.com/sdk)|Interact with Google Cloud Platform|
+|[Terraform](https://www.terraform.io/)|Provisioning of cloud infrastructure|
+|[Packer](https://www.packer.io/)|Provisioning of cloud VM images
+|[CircleCI](https://circleci.com/docs/2.0/local-cli/)|Local features for validating config and testing `circleci` jobs|
+|[Caddy](https://caddyserver.com/)|Secure reverse proxy into the VM services|
 
-## SSH Keys
+### SSH Keys
 
 To support shared identity between the host and the VM machine the standard SSH keys are replicated into the VM. To test authentication to `github` it is possible to use `ssh -T git@github.com` from inside the VM.
-
-## Debugging & Testing
 
 ### Postgres Database
 
@@ -85,6 +92,8 @@ systemctl enable $SERVICE
 systemctl start $SERVICE
 systemctl status $SERVICE
 ```
+
+## Scripts
 
 ### Container Script
 
