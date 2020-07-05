@@ -19,21 +19,19 @@ resource "google_container_cluster" "app_cluster" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  // TODO: Need to authorise networks
   master_auth {
 
     client_certificate_config {
-      issue_client_certificate = false
+      issue_client_certificate = true
     }
   }
 
-  // TODO: Can/should this be restricted to static IP?
-  master_authorized_networks_config {
-    cidr_blocks {
-      display_name = "a network"
-      cidr_block   = "0.0.0.0/0"
-    }
-  }
+  #master_authorized_networks_config {
+  #  cidr_blocks {
+  #    display_name = "a network"
+  #    cidr_block   = "0.0.0.0/0"
+  #  }
+  #}
 
   logging_service    = "logging.googleapis.com/kubernetes"
   monitoring_service = "monitoring.googleapis.com/kubernetes"
@@ -104,6 +102,21 @@ resource "google_service_account_key" "registry_key" {
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
+# Enables access to the runner service account token
+# https://www.terraform.io/docs/providers/google/d/datasource_client_config.html
+data "google_client_config" "runner" {}
+
+# Sets up the provider specifically for this cluster
+# https://www.terraform.io/docs/providers/google/guides/using_gke_with_terraform.html
+provider "kubernetes" {
+  load_config_file = false
+  host             = "https://${google_container_cluster.app_cluster.endpoint}"
+  token            = data.google_client_config.runner.access_token
+  cluster_ca_certificate = base64decode(
+    google_container_cluster.app_cluster.master_auth[0].cluster_ca_certificate,
+  )
+}
+
 # Creates the required k8s Secret
 # https://www.terraform.io/docs/providers/kubernetes/r/secret.html
 resource "kubernetes_secret" "registry_secret" {
@@ -125,4 +138,9 @@ resource "kubernetes_secret" "registry_secret" {
   }
 
   type = "kubernetes.io/dockerconfigjson"
+}
+
+# Outputs the IP endpoint for the cluster
+output "cluster_host" {
+  value = google_container_cluster.app_cluster.endpoint
 }

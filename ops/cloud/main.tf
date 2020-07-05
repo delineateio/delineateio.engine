@@ -1,25 +1,15 @@
 # This is an entrypoint
 terraform {
   required_providers {
-    google = "3.28"
+    google     = "3.28"
+    kubernetes = "1.11.3"
   }
   backend "gcs" {
     prefix = "terraform/state"
   }
 }
 
-variable "gcp_project" {
-  type = string
-}
-
-variable "gcp_region" {
-  type = string
-}
-
-variable "gcp_zone" {
-  type = string
-}
-
-variable "gcp_registry" {
-  type = string
+provider "google" {
+  project = var.gcp_project
+  region  = var.gcp_region
 }

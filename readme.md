@@ -1,6 +1,7 @@
 # Delineate Engine
 
 [![CircleCI](https://circleci.com/gh/delineateio/delineateio.engine.svg?style=shield)](https://circleci.com/gh/delineateio/delineateio.engine)
+[![codebeat badge](https://codebeat.co/badges/f382bda1-32b7-406a-b793-9ae515ae8e52)](https://codebeat.co/projects/github-com-delineateio-delineateio-engine-master)
 [![Github All Releases](https://img.shields.io/github/downloads/delineateio/delineateio.engine/total.svg)](https://github.com/delineateio/delineateio.engine/releases)
 
 ## Purpose
