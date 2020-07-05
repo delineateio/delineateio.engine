@@ -15,13 +15,6 @@
       classic: true
       state: present
 
-#   - name: Install Gosec
-#     snap:
-#      name: gosec
-#      channel: latest/stable
-#      classic: true
-#      state: present
-
    - name: Install golangci
      when: ansible_local.golangci.installed == false
      shell: |

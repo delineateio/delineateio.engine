@@ -16,12 +16,11 @@
       classic: true
       state: present
 
+  # TODO: Reafcor this is into native Ansible modules
    - name: Configure Microk8s
      shell: |
       usermod -a -G microk8s vagrant
       iptables -P FORWARD ACCEPT
-
-# echo '{"insecure-registries" : ["localhost:32000"]}' > /etc/docker/daemon.json
 
    - name: Install Octant
      apt:

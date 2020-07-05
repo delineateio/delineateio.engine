@@ -3,7 +3,3 @@
 .gcloud/
 .terraform/
 .vagrant/
-
-# files
-.secrets.baseline
-hosts
