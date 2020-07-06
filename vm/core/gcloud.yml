@@ -8,7 +8,7 @@
   become: true
   tasks:
 
-   # This needs to be locked to a specific version - this could drift!
+   # TODO: This needs to be locked to a specific version - this could drift!
    # https://github.com/ansible/role-install-gcloud
    - name: Install GCloud
      when: ansible_local.gcloud.installed == false
@@ -17,31 +17,30 @@
         curl https://sdk.cloud.google.com > install.sh
         bash install.sh --disable-prompts
      become_user: vagrant
-     args:
-      warn: no
 
    # install via gcloud for version alignment
    - name: Install Skaffold
      when: ansible_local.skaffold.installed == false
      command: gcloud components install skaffold --quiet
      become_user: vagrant
-     args:
-      warn: no
 
    - name: Install Structure Test
      when: ansible_local.structure.installed == false
-     shell: |
-      cd ~/
-      curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
-      chmod +x container-structure-test-linux-amd64
-      mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
-     args:
-      warn: no
+     get_url:
+      url: https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+      dest: /usr/local/bin/container-structure-test
+      mode: '0775'
+
+   #- name: Install Structure Test
+   #  when: ansible_local.structure.installed == false
+   #  shell: |
+   #   cd ~/
+   #   curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+   #   chmod +x container-structure-test-linux-amd64
+   #   mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
 
    # install via kubectl for version alignment
    - name: Install Kubectl
      when: ansible_local.kubectl.installed == false
      command: gcloud components install kubectl --quiet
      become_user: vagrant
-     args:
-      warn: no

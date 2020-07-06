@@ -23,8 +23,6 @@
 
    - name: "Make Facts Executable"
      command: chmod -R +x /etc/ansible/facts.d
-     args:
-      warn: no
 
    - name: "Refresh Facts"
      setup: ~
