@@ -18,8 +18,6 @@
      with_items:
       - { tool: 'terraform', version: '0.12.26' }
       - { tool: 'packer', version: '1.6.0' }
-     args:
-      warn: no
 
    - name: Install Http
      snap:

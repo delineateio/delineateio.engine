@@ -4,10 +4,10 @@ Documentation=https://caddyserver.com/docs/
 After=network.target
 
 [Service]
-User=caddy
-Group=caddy
-ExecStart=/usr/bin/caddy run --environ --config /caddy/caddyfile --adapter caddyfile
-ExecReload=/usr/bin/caddy reload --config /caddy/caddyfile --adapter caddyfile
+User=root
+Group=root
+ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
+ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile
 TimeoutStopSec=5s
 LimitNOFILE=1048576
 LimitNPROC=512

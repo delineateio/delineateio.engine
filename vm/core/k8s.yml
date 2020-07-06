@@ -16,11 +16,26 @@
       classic: true
       state: present
 
-  # TODO: Reafcor this is into native Ansible modules
-   - name: Configure Microk8s
-     shell: |
-      usermod -a -G microk8s vagrant
-      iptables -P FORWARD ACCEPT
+   - name: Add to Microk8s Group
+     user:
+      name: vagrant
+      groups: microk8s
+      append: yes
+
+   - name: Open Firewall
+     command: iptables -P FORWARD ACCEPT
+
+   - name: Install Kubectx
+     get_url:
+      url: https://github.com/ahmetb/kubectx/releases/download/v0.9.1/kubectx
+      dest: /usr/local/bin/kubectx
+      mode: '0775'
+
+   - name: Install Kubens
+     get_url:
+      url: https://github.com/ahmetb/kubectx/releases/download/v0.9.1/kubens
+      dest: /usr/local/bin/kubens
+      mode: '0775'
 
    - name: Install Octant
      apt:

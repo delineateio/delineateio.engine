@@ -1,5 +1,5 @@
 ---
-- name: Proxy
+- name: Proxy Config
   connection: local
   gather_facts: false
   hosts: all
@@ -7,6 +7,20 @@
     ansible_python_interpreter: /usr/bin/python3
   become: true
   tasks:
+
+   # TODO: Change to run as caddy user rather than root
+
+   - name: Remove PEM file
+     file:
+      path: ~/project/vm/config/caddy/rootCA.pem
+      state: absent
+     become_user: vagrant
+
+   - name: Add Host Entries
+     blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED BLOCK `HOSTS"
+      block: "{{ lookup('file', './.env/hosts.env') }}"
+      dest: /etc/hosts
 
    - name: Caddy Directory Permissions
      file:
@@ -16,17 +30,27 @@
        mode: 0755
        state: directory
 
+   - name: Install Root CA
+     shell:
+      mkcert -uninstall
+      mkcert -install
+
+   - name: Generate Certificates
+     shell: |
+      cd /etc/caddy
+      mkcert -cert-file delineate.dev.pem -key-file delineate.dev.key.pem "*.delineate.local"
+
    - name: Copy Caddyfile
      copy:
       remote_src: yes
-      src: /home/vagrant/project/vm/config/files/caddyfile
-      dest: /etc/caddy/caddyfile
+      src: /home/vagrant/project/vm/config/caddy/Caddyfile
+      dest: /etc/caddy/Caddyfile
       owner: root
 
    - name: Add Caddy Service
      copy:
       remote_src: yes
-      src: /home/vagrant/project/vm/config/services/caddy.service
+      src: /home/vagrant/project/vm/config/caddy/caddy.service
       dest: /etc/systemd/system/caddy.service
       owner: root
 
@@ -36,3 +60,10 @@
       daemon_reload: yes
       enabled: yes
       state: started
+
+   - name: Copy Pem File
+     copy:
+      remote_src: yes
+      src: /root/.local/share/mkcert/rootCA.pem
+      dest: /home/vagrant/project/vm/config/caddy/rootCA.pem
+      owner: vagrant

@@ -37,6 +37,12 @@
        - libnss3-tools=2:3.35-2ubuntu2.8
       state: present
 
+   - name: Install mkcert
+     get_url:
+      url: https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64
+      dest: /usr/local/bin/mkcert
+      mode: '0775'
+
    - name: Install Npm
      apt:
       name: npm=3.5.2-0ubuntu4

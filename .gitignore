@@ -1,5 +1,7 @@
 # dirs
+.tmp/
 .env/
 .gcloud/
 .terraform/
 .vagrant/
+*.pem
