@@ -1,19 +1,47 @@
 version: 2.1
 
 jobs:
-  infra:
+
+  infra_build:
     docker:
       - image: hashicorp/terraform:0.12.26
     environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /gcp.json
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
     steps:
       - checkout
-      - run: echo $GCP_KEY >> /gcp.json
-      - run: cd ./ops/cloud && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
-      - run: cd ./ops/cloud && terraform apply -var="gcp_project=${GCP_PROJECT}" -lock=true -refresh=true -auto-approve
+      - run:
+          name: Add Key
+          command: echo $GCP_KEY > /tmp/gcp.json
+      - run:
+          name: Initialise Terraform
+          command: cd ./ops/cloud && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
+      - run:
+          name: Apply Terraform
+          command: cd ./ops/cloud && terraform apply -var="gcp_project=${GCP_PROJECT}" -lock=true -refresh=true -auto-approve
+
+  infra_test:
+    docker:
+      - image: circleci/ruby:2.5.1
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
+      CHEF_LICENSE: accept-no-persist
+    steps:
+      - checkout
+      - run:
+          name: Add Key
+          command: echo $GCP_KEY > /tmp/gcp.json
+      - run:
+          name: Install InSpec
+          command: gem install inspec-bin -v 4.21.3
+      - run:
+          name: Run InSpec
+          command: cd ./ops/tests && inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GCP_PROJECT
 
 workflows:
   version: 2
   run:
     jobs:
-      - infra
+      - infra_build
+      - infra_test:
+          requires:
+            - infra_build

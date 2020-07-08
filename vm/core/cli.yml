@@ -66,3 +66,8 @@
      apt:
       name: shellcheck=0.4.6-1
       state: present
+
+   - gem:
+      name: inspec
+      version: 4.21.3
+      state: present
