@@ -34,7 +34,12 @@
        - nmap=7.60-1ubuntu5
        - rpm=4.14.1+dfsg1-2
        - apache2-utils=2.4.29-1ubuntu4.13
-       - libnss3-tools=2:3.35-2ubuntu2.8
+       - libnss3-tools=2:3.35-2ubuntu2.9
+       - ruby=1:2.5.1
+       - ruby-dev=1:2.5.1
+       - gcc=4:7.4.0-1ubuntu2.3
+       - g++=4:7.4.0-1ubuntu2.3
+       - make=4.1-9.1ubuntu1
       state: present
 
    - name: Install mkcert

@@ -1,19 +1,79 @@
 version: 2.1
 
 jobs:
-  infra:
+
+  build_infrastructure:
     docker:
       - image: hashicorp/terraform:0.12.26
     environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /gcp.json
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
     steps:
       - checkout
-      - run: echo $GCP_KEY >> /gcp.json
-      - run: cd ./ops/cloud && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
-      - run: cd ./ops/cloud && terraform apply -var="gcp_project=${GCP_PROJECT}" -lock=true -refresh=true -auto-approve
+      - run:
+          name: Add Key
+          command: echo $GCP_KEY > /tmp/gcp.json
+      - run:
+          name: Initialise Terraform
+          command: cd ./ops/cloud && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
+      - run:
+          name: Apply Terraform
+          command: cd ./ops/cloud && terraform apply -var="gcp_project=${GCP_PROJECT}" -lock=true -refresh=true -auto-approve
+
+  test_infrastructure:
+    docker:
+      - image: circleci/ruby:2.5.1
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
+    steps:
+      - checkout
+      - run:
+          name: Add Key
+          command: echo $GCP_KEY > /tmp/gcp.json
+      - run:
+          name: Install InSpec
+          command: gem install inspec-bin -v 4.21.3
+      - run:
+          name: Run InSpec
+          command: cd ./ops/tests && inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GCP_PROJECT
+
+  deploy_app:
+    docker:
+      - image: google/cloud-sdk:300.0.0-alpine
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Add Key
+          command: echo $GCP_KEY > /tmp/gcp.json
+      - run:
+          name: Install GCP Components
+          command: gcloud components install kubectl skaffold --quiet
+      - run:
+          name: Install Container Structure Test
+          command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+      - run:
+          name: Set GCP Project
+          command: gcloud config set project $GCP_PROJECT
+      - run:
+          name: Authenticate GCP Service Account
+          command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
+      - run:
+          name: Add GKE Config
+          command: gcloud container clusters get-credentials app-cluster -z $GCP_ZONE
+      - run:
+          name: Deploy to GKE
+          command: cd ./dev/services/customers && skaffold run -p "staging" -d "$GCP_REGISTRY/$GCP_PROJECT"
 
 workflows:
   version: 2
   run:
     jobs:
-      - infra
+      - build_infrastructure
+      - test_infrastructure:
+          requires:
+            - build_infrastructure
+      - deploy_app:
+          requires:
+            - build_infrastructure
