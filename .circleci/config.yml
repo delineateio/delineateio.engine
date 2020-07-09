@@ -44,6 +44,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+    steps:
+      - checkout
       - run:
           name: Add Key
           command: echo $GCP_KEY > /tmp/gcp.json
