@@ -31,8 +31,6 @@ Delineate is a platform for taking business ideas to end users without losing cl
 
 To make setup of the development environment as easy as possible a Hashicorp Vagrant file has been provided with an Ansible playbooks to install dependencies.  `vagrant` is the only mandatory pr-installed desktop software required to stand up a dev environment.
 
-> Please note that the `vagrantfile` contains specific configuration to run using VMWare provider, which is a commercial product.  This can be commented out if required, for example to use Virtualbox.
-
 The IDE will be installed on host. Any IDE can be used although the `.vscode` directory has been committed tothe repo to enable sharing of settings between contributors.
 
 ### Secrets
@@ -73,7 +71,7 @@ The `vagrantfile` ensures that the following components are installed and config
 |[Terraform](https://www.terraform.io/)|Provisioning of cloud infrastructure|
 |[Packer](https://www.packer.io/)|Provisioning of cloud VM images
 |[CircleCI](https://circleci.com/docs/2.0/local-cli/)|Local features for validating config and testing `circleci` jobs|
-|[Caddy](https://caddyserver.com/)|Secure reverse proxy into the VM services|
+|[NGINX](https://www.nginx.com/)|Secure reverse proxy into the VM services|
 
 ### SSH Keys
 

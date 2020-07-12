@@ -25,7 +25,10 @@ export LOCATION=../config
 
 # Starts SSH sessions in the project folder and enables scripts
 cd ~/project || return
+clear
 
-# TODO: This is messy - ideally done by provisioning!
 # shellcheck disable=SC2046
 chmod +x $(find . -type f -name "*.sh")
+
+# Ensures starship prompt used
+eval "$(starship init bash)"
