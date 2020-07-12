@@ -12,6 +12,7 @@
      file:
       path: "/etc/ansible/facts.d"
       state: directory
+      mode: '0755'
       owner: vagrant
 
    - name: "Add Facts"
@@ -23,6 +24,8 @@
 
    - name: "Make Facts Executable"
      command: chmod -R +x /etc/ansible/facts.d
+     args:
+      warn: false
 
    - name: "Refresh Facts"
      setup: ~

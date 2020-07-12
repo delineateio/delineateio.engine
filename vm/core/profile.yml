@@ -17,3 +17,25 @@
       src: ~/project/vm/core/files/.bash_profile
       dest: ~/.bash_profile
      become_user: vagrant
+
+   - name: Download Starship Prompt
+     command: wget -P ~/starship  https://starship.rs/install.sh
+     args:
+      warn: false
+
+   - name: Install Starship Prompt
+     command: bash ~/starship/install.sh --yes
+
+   - name: Create Starship Directory
+     file:
+       path: ~/.config
+       state: directory
+       mode: '0755'
+     become_user: vagrant
+
+   - name: Adds Starship Config
+     copy:
+      remote_src: yes
+      src: ~/project/vm/core/files/starship.toml
+      dest: ~/.config/starship.toml
+     become_user: vagrant

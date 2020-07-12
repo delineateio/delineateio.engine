@@ -8,62 +8,41 @@
   become: true
   tasks:
 
-   # TODO: Change to run as caddy user rather than root
-
-   - name: Remove PEM file
+   - name: Remove Default Config
      file:
-      path: ~/project/vm/config/caddy/rootCA.pem
+      path: /etc/nginx/sites-enabled/default
       state: absent
-     become_user: vagrant
 
-   - name: Add Host Entries
-     blockinfile:
-      marker: "# {mark} ANSIBLE MANAGED BLOCK `HOSTS"
-      block: "{{ lookup('file', './.env/hosts.env') }}"
-      dest: /etc/hosts
-
-   - name: Caddy Directory Permissions
+   - name: Create TLS Directory
      file:
-       path: /etc/caddy
-       owner: root
-       group: root
-       mode: 0755
+       path: /tls
        state: directory
+       mode: '0755'
+
+   - name: Uninstall Root CA
+     command: mkcert -uninstall
 
    - name: Install Root CA
-     shell:
-      mkcert -uninstall
-      mkcert -install
+     command: mkcert -install
 
    - name: Generate Certificates
-     shell: |
-      cd /etc/caddy
-      mkcert -cert-file delineate.dev.pem -key-file delineate.dev.key.pem "*.delineate.local"
+     command: mkcert -cert-file /tls/delineate.local.crt -key-file /tls/delineate.local.key "delineate.local" localhost 127.0.0.1 ::1
 
-   - name: Copy Caddyfile
+   - name: Copy NGINX Config
      copy:
-      remote_src: yes
-      src: /home/vagrant/project/vm/config/caddy/Caddyfile
-      dest: /etc/caddy/Caddyfile
-      owner: root
+      src: /home/vagrant/project/vm/config/nginx/nginx.conf
+      dest: /etc/nginx/sites-enabled/nginx.conf
 
-   - name: Add Caddy Service
-     copy:
-      remote_src: yes
-      src: /home/vagrant/project/vm/config/caddy/caddy.service
-      dest: /etc/systemd/system/caddy.service
-      owner: root
-
-   - name: Start Caddy Service
+   - name: Start NGINX Service
      systemd:
-      name:  caddy.service
-      daemon_reload: yes
+      name:  nginx.service
+      scope: system
       enabled: yes
-      state: started
+      state: restarted
+     become_user: root
 
-   - name: Copy Pem File
+   - name: Copy Certificate
      copy:
       remote_src: yes
       src: /root/.local/share/mkcert/rootCA.pem
-      dest: /home/vagrant/project/vm/config/caddy/rootCA.pem
-      owner: vagrant
+      dest: /home/vagrant/project/vm/config/nginx/rootCA.pem

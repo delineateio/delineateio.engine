@@ -18,6 +18,8 @@
      with_items:
       - { tool: 'terraform', version: '0.12.26' }
       - { tool: 'packer', version: '1.6.0' }
+     args:
+      warn: false
 
    - name: Install Http
      snap:
@@ -29,6 +31,12 @@
      npm:
       name: snyk
       version: 1.346.0
+      global: yes
+
+   - name: HTTP Status
+     npm:
+      name: stts
+      version: 1.1.0
       global: yes
 
    - name: Install Trivy
@@ -67,7 +75,8 @@
       name: shellcheck=0.4.6-1
       state: present
 
-   - gem:
+   - name: Install InSpec
+     gem:
       name: inspec
       version: 4.21.3
       state: present

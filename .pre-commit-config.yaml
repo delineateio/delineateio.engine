@@ -34,8 +34,6 @@ repos:
     - id: terraform-validate
       name: Validate Terraform
 
-# TODO: Implement golang monorepo checks!
-
 - repo: https://github.com/yelp/detect-secrets.git
   rev: v0.13.1
   hooks:

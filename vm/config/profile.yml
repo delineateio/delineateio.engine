@@ -34,3 +34,9 @@
       marker: "# {mark} ANSIBLE MANAGED BLOCK GOOGLE"
       block: "{{ lookup('file', './.env/gcp.env') }}"
       dest: ~/.bash_profile
+
+   - name: Supress Login Messages
+     file:
+      path: ~/.hushlogin
+      state: touch
+     become_user: vagrant
