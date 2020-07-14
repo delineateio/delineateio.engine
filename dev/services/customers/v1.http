@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:8080
+@baseUrl = https://api.delineate.dev
 
 GET {{baseUrl}}/healthz HTTP/2
 content-type: application/json

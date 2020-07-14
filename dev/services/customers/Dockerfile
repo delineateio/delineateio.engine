@@ -54,7 +54,10 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /go/bin/app /bin/app
 
 COPY ./config /config
-EXPOSE 8080
+EXPOSE 1102
+
+# Enables bind to lower port
+RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /bin/app
 
 # Use an unprivileged user.
 USER appuser:appuser
