@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: service
+  name: customer-service
 spec:
   type: NodePort
   ports:
-  - port: 8080
-    targetPort: 8080
+  - port: 1102
+    targetPort: 1102
     protocol: TCP
     name: http
   selector:
-    run: pod
+    run: customer-pod

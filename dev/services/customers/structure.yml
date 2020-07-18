@@ -12,7 +12,7 @@ metadataTest:
       value: "https://github.com/delineateio/delineateio.engine"
     - key: org.label-schema.vendor
       value: "delineate.io"
-  exposedPorts: ["8080"]
+  exposedPorts: ["1102"]
   cmd: ["/bin/app"]
   entrypoint: []
   workdir: ""

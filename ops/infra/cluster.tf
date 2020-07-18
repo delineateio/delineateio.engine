@@ -13,6 +13,8 @@ resource "google_container_cluster" "app_cluster" {
   description        = "Cluster for application hosting"
   project            = var.gcp_project
   location           = var.gcp_zone
+  network            = google_compute_network.app_network.self_link
+  subnetwork         = google_compute_subnetwork.app_subnet.self_link
   min_master_version = data.google_container_engine_versions.app_cluster_version.latest_node_version
 
   # Replaces with node pool after creation
@@ -25,13 +27,6 @@ resource "google_container_cluster" "app_cluster" {
       issue_client_certificate = true
     }
   }
-
-  #master_authorized_networks_config {
-  #  cidr_blocks {
-  #    display_name = "a network"
-  #    cidr_block   = "0.0.0.0/0"
-  #  }
-  #}
 
   logging_service    = "logging.googleapis.com/kubernetes"
   monitoring_service = "monitoring.googleapis.com/kubernetes"
@@ -106,18 +101,7 @@ resource "google_service_account_key" "registry_key" {
 # https://www.terraform.io/docs/providers/google/d/datasource_client_config.html
 data "google_client_config" "runner" {}
 
-# Sets up the provider specifically for this cluster
-# https://www.terraform.io/docs/providers/google/guides/using_gke_with_terraform.html
-provider "kubernetes" {
-  load_config_file = false
-  host             = "https://${google_container_cluster.app_cluster.endpoint}"
-  token            = data.google_client_config.runner.access_token
-  cluster_ca_certificate = base64decode(
-    google_container_cluster.app_cluster.master_auth[0].cluster_ca_certificate,
-  )
-}
-
-# Creates the required k8s Secret
+# Creates the required image pull Secret
 # https://www.terraform.io/docs/providers/kubernetes/r/secret.html
 resource "kubernetes_secret" "registry_secret" {
   metadata {
@@ -141,6 +125,6 @@ resource "kubernetes_secret" "registry_secret" {
 }
 
 # Outputs the IP endpoint for the cluster
-output "cluster_host" {
+output "cluster_ip" {
   value = google_container_cluster.app_cluster.endpoint
 }

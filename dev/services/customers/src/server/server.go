@@ -79,7 +79,6 @@ func (s *Server) CreateRouter() *gin.Engine {
 	router := gin.Default()
 
 	// Adds healthz at the route
-	s.addHealthz(router)
 	l.Info("server.router.create", "created the GIN router")
 
 	// Adds the routes
@@ -91,12 +90,6 @@ func (s *Server) CreateRouter() *gin.Engine {
 	}
 
 	return router
-}
-
-func (s *Server) addHealthz(router *gin.Engine) {
-	router.GET("/healthz", func(ctx *gin.Context) {
-		Dispatch(ctx, Healthz)
-	})
 }
 
 // Start the server and ensure it's configured
@@ -115,7 +108,7 @@ func (s *Server) Start() {
 	l.Info("server.timeouts", "server timeout configuration completed")
 
 	// Starts the server
-	port := c.GetString("server.port", "8080")
+	port := c.GetString("server.port", "1102")
 	_ = endless.ListenAndServe(":"+port, s.Router)
 
 	if err != nil {
