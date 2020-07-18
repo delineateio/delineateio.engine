@@ -1,7 +1,7 @@
 # Select the available version for the cluster
 # https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
 data "google_container_engine_versions" "app_cluster_version" {
-  location       = var.gcp_zone
+  location       = data.google_client_config.context.zone
   version_prefix = "1.16."
 }
 
@@ -11,8 +11,7 @@ resource "google_container_cluster" "app_cluster" {
 
   name               = "app-cluster"
   description        = "Cluster for application hosting"
-  project            = var.gcp_project
-  location           = var.gcp_zone
+  location           = data.google_client_config.context.zone
   network            = google_compute_network.app_network.self_link
   subnetwork         = google_compute_subnetwork.app_subnet.self_link
   min_master_version = data.google_container_engine_versions.app_cluster_version.latest_node_version
@@ -41,8 +40,7 @@ resource "google_container_cluster" "app_cluster" {
 resource "google_container_node_pool" "app_cluster_nodes" {
 
   name     = "app-cluster-node-pool"
-  project  = var.gcp_project
-  location = var.gcp_zone
+  location = data.google_client_config.context.zone
   cluster  = google_container_cluster.app_cluster.name
 
   initial_node_count = 1
@@ -97,10 +95,6 @@ resource "google_service_account_key" "registry_key" {
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
 
-# Enables access to the runner service account token
-# https://www.terraform.io/docs/providers/google/d/datasource_client_config.html
-data "google_client_config" "runner" {}
-
 # Creates the required image pull Secret
 # https://www.terraform.io/docs/providers/kubernetes/r/secret.html
 resource "kubernetes_secret" "registry_secret" {
@@ -111,7 +105,7 @@ resource "kubernetes_secret" "registry_secret" {
   data = {
     ".dockerconfigjson" = jsonencode({
       "auths" : {
-        "https://${var.gcp_registry}/${var.gcp_project}" : {
+        "https://${var.gcp_registry}/${data.google_client_config.context.project}" : {
           email    = google_service_account.registry_service_account.email
           username = "_json_key"
           password = trimspace(base64decode(google_service_account_key.registry_key.private_key))

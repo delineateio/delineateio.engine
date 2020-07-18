@@ -17,5 +17,5 @@ deploy:
 profiles:
 - name: local # Local k8s
 - name: dev # Unrestricted Cloud dev env
-- name: staging # Only via the pipeline
+- name: pub # Only via the pipeline
 - name: prod # Only via the pipeline

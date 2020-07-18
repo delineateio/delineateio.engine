@@ -45,4 +45,4 @@
      copy:
       remote_src: yes
       src: /root/.local/share/mkcert/rootCA.pem
-      dest: /home/vagrant/project/vm/config/nginx/rootCA.pem
+      dest: /home/vagrant/project/vm/certs/rootCA.pem

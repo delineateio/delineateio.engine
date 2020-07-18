@@ -5,6 +5,8 @@ import (
 
 	s "github.com/delineateio/core/server"
 	"github.com/gin-gonic/gin"
+
+	_ "github.com/swaggo/gin-swagger/example/basic/docs"
 )
 
 func main() {

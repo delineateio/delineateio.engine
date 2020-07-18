@@ -16,7 +16,7 @@
       unzip "{{ item.tool }}_{{ item.version }}_linux_amd64.zip"
       sudo install "{{ item.tool }}" /usr/local/bin/
      with_items:
-      - { tool: 'terraform', version: '0.12.26' }
+      - { tool: 'terraform', version: '0.12.28' }
       - { tool: 'packer', version: '1.6.0' }
      args:
       warn: false

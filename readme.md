@@ -106,12 +106,6 @@ The script runs the following steps:
 * Container security scan using [snyk](https://snyk.io/)
 * Container security scan using [trivy](https://github.com/aquasecurity/trivy)
 
-### Up Script
-
-The `up` script provided at `./dev/stack/up.sh` uses `docker-compose` to stand up a lightweight stack for testing purposes.  Re-running the script will take down and they put up the stack.
-
-For the full documentation please refer to `docker` and the `docker-compose` [offical documentation](https://github.com/docker/compose).
-
 ### Local Script
 
 The script provided at `./dev/services/local.sh $SERVICE` will switch to the local `microk8s` cluster and use `skaffold` to deploy the specified service.

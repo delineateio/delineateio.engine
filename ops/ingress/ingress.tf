@@ -1,10 +1,8 @@
-# Enables access to the runner service account token
-# https://www.terraform.io/docs/providers/google/d/datasource_client_config.html
-data "google_client_config" "runner" {}
-
+# Gets access to the already created cluster
+# https://www.terraform.io/docs/providers/google/d/container_cluster.html
 data "google_container_cluster" "app_cluster" {
   name     = "app-cluster"
-  location = var.gcp_zone
+  location = data.google_client_config.context.zone
 }
 
 # Retrieves the cert from the secret store
@@ -21,7 +19,6 @@ data "google_secret_manager_secret_version" "domain_key" {
 
 # Adds the required k8s tls secrets from the secret store
 # https://www.terraform.io/docs/providers/kubernetes/r/secret.html
-# TODO: Secrets should be pulled from Hashicorp Vault (once available)
 resource "kubernetes_secret" "tls_secret" {
 
   metadata {

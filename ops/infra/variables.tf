@@ -1,26 +1,13 @@
-# GCP project ID
-variable "gcp_project" {
-  type = string
-}
-
-# GCP default region
-variable "gcp_region" {
-  type = string
-}
-
-# GCP default zone
-variable "gcp_zone" {
-  type = string
-}
-
-# GCP default zone
+# GCP default registry
 variable "gcp_registry" {
-  type = string
+  type    = string
+  default = "eu.gcr.io"
 }
 
 # GCP Cluster CIDR range
 variable "app_cidr_range" {
-  type = string
+  type    = string
+  default = "10.2.0.0/16"
 }
 
 # Cloudflare domain

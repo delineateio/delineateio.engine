@@ -5,7 +5,7 @@ clear
 SERVICE="${1:-customers}"
 ROOT="$(git rev-parse --show-toplevel)"
 PROFILE="dev"
-REPO="${GCP_REGISTRY}/${GCP_PROJECT}"
+REPO="${GOOGLE_REGISTRY}/${GOOGLE_PROJECT}"
 
 echo
 echo "service:  ${DETAIL}${SERVICE}${RESET}"
