@@ -11,16 +11,16 @@
    - name: Authenticate GCloud
      shell: |
        gcloud auth activate-service-account \
-        ${GCP_SERVICE_ACCOUNT} \
+        ${GOOGLE_SERVICE_ACCOUNT} \
         --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
-        gcloud config set account ${GCP_SERVICE_ACCOUNT}
+        gcloud config set account ${GOOGLE_SERVICE_ACCOUNT}
      become_user: vagrant
 
    - name: Configure GCloud
      shell: |
-       gcloud config set project ${GCP_PROJECT}
-       gcloud config set compute/region ${GCP_REGION}
-       gcloud config set compute/zone ${GCP_ZONE}
+       gcloud config set project ${GOOGLE_PROJECT}
+       gcloud config set compute/region ${GOOGLE_REGION}
+       gcloud config set compute/zone ${GOOGLE_ZONE}
      become_user: vagrant
 
    - name: Create .kube Directory
@@ -53,7 +53,7 @@
      become_user: vagrant
 
    - name: Add Dev Cluster
-     command: gcloud container clusters get-credentials ${GCP_CLUSTER_NAME}
+     command: gcloud container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
      become_user: vagrant
 
    - name: Rename Dev Cluster
@@ -67,17 +67,3 @@
        gcloud auth configure-docker -q
        docker-credential-gcr configure-docker
      become_user: vagrant
-
-   - name: Add Octant Service
-     copy:
-      remote_src: yes
-      src: /home/vagrant/project/vm/config/octant/octant.service
-      dest: /etc/systemd/system/octant.service
-      owner: root
-
-   - name: Start Octant Service
-     systemd:
-      name: octant.service
-      daemon_reload: yes
-      enabled: yes
-      state: started

@@ -16,5 +16,5 @@ db:
       maxOpen: 75
       maxLifetime: 10m
     retries:
-      attempts: 10
-      delay: 3s
+      attempts: 20
+      delay: 300ms

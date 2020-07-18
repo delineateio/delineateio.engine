@@ -16,13 +16,5 @@ db:
       maxOpen: 100
       maxLifetime: 1h
     retries:
-      attempts: 5
-      delay: 100ms
-
-#health
-  # checks
-    # name:
-    # type: http | db
-    # url
-    # interval
-    # fatal
+      attempts: 20
+      delay: 300ms

@@ -1,25 +1,30 @@
 version: 2.1
 
+parameters:
+  terraform-image:
+    type: string
+    default: "hashicorp/terraform:0.12.28"
+  gcloud-image:
+    type: string
+    default: "google/cloud-sdk:300.0.0-alpine"
+  ruby-image:
+    type: string
+    default: "circleci/ruby:2.5.1"
+
 jobs:
 
   build_infrastructure:
     docker:
-      - image: hashicorp/terraform:0.12.26
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
+      - image: << pipeline.parameters.terraform-image >>
     steps:
       - checkout
       - run:
-          name: Add GCP Key
-          command: echo $GCP_KEY > /tmp/gcp.json
-      - run:
           name: Initialise Terraform
-          command: cd ./ops/infra && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
+          command: cd ./ops/infra && terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
       - run:
           name: Plan Infrastructure
           command: |
-            cd ./ops/infra && terraform plan -var="gcp_project=${GCP_PROJECT}" \
-                                             -var="cloudflare_domain=${CLOUDFLARE_DOMAIN}" \
+            cd ./ops/infra && terraform plan -var="cloudflare_domain=${CLOUDFLARE_DOMAIN}" \
                                              -lock=true -refresh=true -out=plan.out
       - run:
           name: Apply Infrastructure
@@ -28,25 +33,25 @@ jobs:
 
   test_infrastructure:
     docker:
-      - image: circleci/ruby:2.5.1
+      - image: << pipeline.parameters.ruby-image >>
     environment:
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
     steps:
       - checkout
       - run:
           name: Add GCP Key
-          command: echo $GCP_KEY > /tmp/gcp.json
+          command: echo $GOOGLE_CREDENTIALS > /tmp/gcp.json
       - run:
           name: Install InSpec
           command: gem install inspec-bin -v 4.21.3
       - run:
           name: Run InSpec
-          command: cd ./ops/tests && inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GCP_PROJECT
+          command: cd ./ops/tests && inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GOOGLE_PROJECT
 
 
   deploy_app:
     docker:
-      - image: google/cloud-sdk:300.0.0-alpine
+      - image: << pipeline.parameters.gcloud-image >>
     environment:
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
     steps:
@@ -54,7 +59,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Add GCP Key
-          command: echo $GCP_KEY > /tmp/gcp.json
+          command: echo $GOOGLE_CREDENTIALS > /tmp/gcp.json
       - run:
           name: Install GCP Components
           command: gcloud components install kubectl skaffold --quiet
@@ -63,35 +68,29 @@ jobs:
           command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
       - run:
           name: Set GCP Project
-          command: gcloud config set project $GCP_PROJECT
+          command: gcloud config set project $GOOGLE_PROJECT
       - run:
           name: Authenticate GCP Service Account
           command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
       - run:
           name: Add GKE Config
-          command: gcloud container clusters get-credentials app-cluster -z $GCP_ZONE
+          command: gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE
       - run:
           name: Deploy to GKE
-          command: cd ./dev/services/customers && skaffold run -p "staging" -d "$GCP_REGISTRY/$GCP_PROJECT"
+          command: cd ./dev/services/customers && skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
 
   configure_ingress:
     docker:
-      - image: hashicorp/terraform:0.12.26
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
+      - image: << pipeline.parameters.terraform-image >>
     steps:
       - checkout
       - run:
-          name: Add GCP Key
-          command: echo $GCP_KEY > /tmp/gcp.json
-      - run:
           name: Initialise Terraform
-          command: cd ./ops/ingress && terraform init -backend-config="bucket=${GCP_PROJECT}-tf"
+          command: cd ./ops/ingress && terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
       - run:
           name: Plan Ingress
           command: |
-            cd ./ops/ingress && terraform plan -var="gcp_project=${GCP_PROJECT}" \
-                                             -var="cloudflare_domain=${CLOUDFLARE_DOMAIN}" \
+            cd ./ops/ingress && terraform plan -var="cloudflare_domain=${CLOUDFLARE_DOMAIN}" \
                                              -var="cloudflare_zone=${CLOUDFLARE_ZONE}" \
                                              -lock=true -refresh=true -out=plan.out
       - run:
