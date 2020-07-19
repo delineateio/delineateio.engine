@@ -26,7 +26,7 @@ func TestHTTPCustomerRouteMockDB(t *testing.T) {
 	}
 
 	// Configures the server
-	server := s.NewServer(getRoutes, r)
+	server := s.NewServer(getRoutes)
 	server.Env = "http"
 	server.Location = "../tests"
 	server.Configure()

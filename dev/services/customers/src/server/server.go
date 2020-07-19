@@ -1,6 +1,7 @@
 package server
 
 import (
+	"os"
 	"strings"
 
 	c "github.com/delineateio/core/config"
@@ -12,13 +13,20 @@ import (
 )
 
 // NewServer creates a new server
-func NewServer(getRoutes func() []gin.RouteInfo, repository r.IRepository) *Server {
-	return &Server{
-		Repository: repository,
-		Mode:       getMode(),
-		GetRoutes:  getRoutes,
-		TimeOuts:   readTimeOuts(),
+func NewServer(routes func() []gin.RouteInfo) *Server {
+	// Gets env
+	env := os.Getenv("ENV")
+	location := os.Getenv("LOCATION")
+
+	server := &Server{
+		Env:       env,
+		Location:  location,
+		GetRoutes: routes,
 	}
+	server.Configure()
+	server.setMode()
+	server.TimeOuts = readTimeOuts()
+	return server
 }
 
 // Server represents the encapulsation of a service
@@ -38,14 +46,17 @@ type Server struct {
 // Configure returns the router that will be returned
 func (s *Server) Configure() {
 	// Before do anything need to load the configuration
-	c.NewConfigurator(s.Env, s.Location).LoadWithCallback(reload)
+	c.NewConfigurator(s.Env, s.Location).LoadWithCallback(s.reload)
 
 	// Sets up the logger - this is abastracted into a separate func so
 	// that it can be called as part of the reload
-	setLogger()
+	s.setLogger()
+
+	// Logs the config level
+	l.Info("config.initialised", "the env config has been set to '"+s.Env+"'")
 }
 
-func setLogger() {
+func (s *Server) setLogger() {
 	// Gets the config
 	level := c.GetString("logging.level", "warn")
 
@@ -53,22 +64,21 @@ func setLogger() {
 	l.NewLogger(level).Load()
 }
 
-func reload(in fsnotify.Event) {
+func (s *Server) reload(in fsnotify.Event) {
 	// Sets up the logger
-	setLogger()
+	s.setLogger()
 
 	// Sets the timeouts
 	setTimeOuts()
 }
 
-func getMode() string {
+func (s *Server) setMode() {
 	mode := strings.ToLower(c.GetString("server.mode", "release"))
 	if mode != gin.ReleaseMode && mode != gin.DebugMode {
 		l.Warn("server.mode", "Configuration incorrect, defaulted to 'release'")
-		return gin.ReleaseMode
+		mode = gin.ReleaseMode
 	}
-
-	return mode
+	s.Mode = mode
 }
 
 // CreateRouter returns the router that will be returned

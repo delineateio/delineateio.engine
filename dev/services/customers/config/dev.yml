@@ -1,6 +1,6 @@
 server:
   port: 1102
-  mode: debug
+  mode: release
   timeouts:
     read: 30m
     write: 30m
@@ -17,4 +17,4 @@ db:
       maxLifetime: 1h
     retries:
       attempts: 20
-      delay: 300ms
+      delay: 10s
