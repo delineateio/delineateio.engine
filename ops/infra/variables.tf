@@ -1,21 +1,13 @@
 # GCP default registry
 variable "gcp_registry" {
-  type    = string
-  default = "eu.gcr.io"
+  type = string
 }
 
 # GCP Cluster CIDR range
 variable "app_cidr_range" {
-  type    = string
-  default = "10.2.0.0/16"
+  type = string
 }
 
 variable "machine_type" {
-  type    = string
-  default = "n1-standard-2"
-}
-
-# Cloudflare domain
-variable "cloudflare_domain" {
   type = string
 }

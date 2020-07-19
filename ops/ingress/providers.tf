@@ -29,4 +29,7 @@ provider "kubernetes" {
 }
 
 # Cloudflare provider is setup by env variables
-provider "cloudflare" {}
+# https://www.terraform.io/docs/providers/cloudflare/guides/version-2-upgrade.html
+provider "cloudflare" {
+  api_token = local.cloudflare_token
+}

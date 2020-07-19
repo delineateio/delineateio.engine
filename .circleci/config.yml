@@ -10,56 +10,75 @@ parameters:
   ruby-image:
     type: string
     default: "circleci/ruby:2.5.1"
+  inspec-version:
+    type: string
+    default: "4.21.3"
+
+commands:
+  set_branch:
+    steps:
+      - run:
+          name: Configure for Branch
+          command: bash ./.circleci/branch.sh
+  gcp_key:
+    steps:
+      - run:
+          name: "Add GCP Key"
+          command: source ~/.env && echo $GOOGLE_CREDENTIALS > /tmp/gcp.json
+  add_bash:
+    steps:
+      - run:
+          name: Install Bash
+          command: apk add bash
+  gcp_update:
+    steps:
+      - run:
+          name: Update Infrastructure
+          command: |
+            source ~/.env
+            cd ./ops/infra
+            terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
+            terraform plan -var-file="./env/${DELINEATEIO_ENV}.tfvars" -lock=true -refresh=true -out=plan.out
+            terraform apply -lock=true -refresh=true -auto-approve plan.out
 
 jobs:
-
   build_infrastructure:
     docker:
       - image: << pipeline.parameters.terraform-image >>
+    environment:
+      BASH_ENV: "~/.bash_profile"
     steps:
+      - add_bash
       - checkout
-      - run:
-          name: Initialise Terraform
-          command: cd ./ops/infra && terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-      - run:
-          name: Plan Infrastructure
-          command: |
-            cd ./ops/infra && terraform plan -var="cloudflare_domain=${CLOUDFLARE_DOMAIN}" \
-                                             -lock=true -refresh=true -out=plan.out
-      - run:
-          name: Apply Infrastructure
-          command: cd ./ops/infra && terraform apply -lock=true -refresh=true -auto-approve plan.out
-
+      - set_branch
+      - gcp_key
+      - gcp_update
 
   test_infrastructure:
     docker:
       - image: << pipeline.parameters.ruby-image >>
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
     steps:
       - checkout
-      - run:
-          name: Add GCP Key
-          command: echo $GOOGLE_CREDENTIALS > /tmp/gcp.json
+      - set_branch
+      - gcp_key
       - run:
           name: Install InSpec
-          command: gem install inspec-bin -v 4.21.3
+          command: gem install inspec-bin -v << pipeline.parameters.inspec-version >>
       - run:
           name: Run InSpec
-          command: cd ./ops/tests && inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GOOGLE_PROJECT
-
+          command: |
+            source ~/.env
+            cd ./ops/tests
+            inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GOOGLE_PROJECT
 
   deploy_app:
     docker:
       - image: << pipeline.parameters.gcloud-image >>
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp.json
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Add GCP Key
-          command: echo $GOOGLE_CREDENTIALS > /tmp/gcp.json
+      - set_branch
+      - gcp_key
       - run:
           name: Install GCP Components
           command: gcloud components install kubectl skaffold --quiet
@@ -68,34 +87,36 @@ jobs:
           command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
       - run:
           name: Set GCP Project
-          command: gcloud config set project $GOOGLE_PROJECT
+          command: source ~/.env && gcloud config set project $GOOGLE_PROJECT
       - run:
           name: Authenticate GCP Service Account
           command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
       - run:
           name: Add GKE Config
-          command: gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE
+          command: source ~/.env && gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE
       - run:
           name: Deploy to GKE
-          command: cd ./dev/services/customers && skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
+          command: |
+            source ~/.env
+            cd ./dev/services/customers
+            skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
 
   configure_ingress:
     docker:
       - image: << pipeline.parameters.terraform-image >>
     steps:
+      - add_bash
       - checkout
+      - set_branch
       - run:
           name: Initialise Terraform
-          command: cd ./ops/ingress && terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
+          command: source ~/.env && cd ./ops/ingress && terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
       - run:
           name: Plan Ingress
-          command: |
-            cd ./ops/ingress && terraform plan -var="cloudflare_domain=${CLOUDFLARE_DOMAIN}" \
-                                             -var="cloudflare_zone=${CLOUDFLARE_ZONE}" \
-                                             -lock=true -refresh=true -out=plan.out
+          command: source ~/.env && cd ./ops/ingress && terraform plan -lock=true -refresh=true -out=plan.out
       - run:
           name: Apply Ingress
-          command: cd ./ops/ingress && terraform apply -lock=true -refresh=true -auto-approve plan.out
+          command: source ~/.env && cd ./ops/ingress && terraform apply -lock=true -refresh=true -auto-approve plan.out
 
 workflows:
   version: 2
