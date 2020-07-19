@@ -20,4 +20,4 @@ profiles:
 - name: local # Local k8s
 - name: dev # Unrestricted Cloud dev env
 - name: pub # Only via the pipeline
-- name: prod # Only via the pipeline
+- name: io # Only via the pipeline

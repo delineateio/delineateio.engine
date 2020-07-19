@@ -6,8 +6,6 @@ ansible_home      = "/home/vagrant/project/vm"
 
 core_playbooks    = ["bootstrap","profile","facts","docker","k8s","gcloud","go","cli","git"]
 config_playbooks  = ["profile","docker","k8s","gcloud","proxy","git"]
-core_playbooks    = []
-config_playbooks  = ["profile"]
 
 Vagrant.configure("2") do |config|
 

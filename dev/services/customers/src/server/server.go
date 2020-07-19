@@ -15,8 +15,8 @@ import (
 // NewServer creates a new server
 func NewServer(routes func() []gin.RouteInfo) *Server {
 	// Gets env
-	env := os.Getenv("ENV")
-	location := os.Getenv("LOCATION")
+	env := os.Getenv("DELINEATEIO_ENV")
+	location := os.Getenv("DELINEATEIO_LOCATION")
 
 	server := &Server{
 		Env:       env,

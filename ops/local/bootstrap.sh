@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-if [ "$ENV" != "local" ]
+if [ "$DELINEATEIO_ENV" != "local" ]
 then
     echo
     echo "${WARN}The kubctl must be set to 'local' to bootstrap the local cluster!"; exit 1;

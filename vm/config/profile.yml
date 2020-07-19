@@ -32,7 +32,7 @@
    - name: Add Google Env
      blockinfile:
       marker: "# {mark} ANSIBLE MANAGED BLOCK GOOGLE"
-      block: "{{ lookup('file', './.env/gcp.env') }}"
+      block: "{{ lookup('file', './.env/google.env') }}"
       dest: ~/.bash_profile
 
    - name: Supress Login Messages

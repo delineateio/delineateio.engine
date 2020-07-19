@@ -17,7 +17,7 @@ type IConfigurator interface {
 // NewConfigurator gets a new production configurator
 func NewConfigurator(env, location string) *Configurator {
 	if env == "" {
-		env = "prod"
+		env = "io"
 	}
 
 	if location == "" {

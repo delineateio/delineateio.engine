@@ -20,9 +20,9 @@ spec:
         ports:
         - containerPort: 1102
         env:
-        - name: ENV
+        - name: DELINEATEIO_ENV
           value: "dev"
-        - name: LOCATION
+        - name: DELINEATEIO_LOCATION
           value: "/config"
         resources:
           requests:

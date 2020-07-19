@@ -5,7 +5,7 @@ clear
 ROOT="$(git rev-parse --show-toplevel)"
 SERVICE="${1:-customers}"
 FOLDER="${ROOT}/dev/services/${SERVICE}"
-ENV="prod" # Verifies the production config
+ENV="io" # Verifies the production config
 LOCATION="/config"
 PORT=$(yq r - 'server.port' < "${FOLDER}/config/${ENV}.yml")
 IMAGE_NAME="${SERVICE}:$(git rev-parse --short HEAD)-${ENV}"

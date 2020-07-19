@@ -1,3 +1,22 @@
+# Retrieves the cloudflare secrets
+# https://www.terraform.io/docs/providers/google/d/secret_manager_secret_version.html
+data "google_secret_manager_secret_version" "cloudflare_zone" {
+  secret = "cloudflare-zone"
+}
+data "google_secret_manager_secret_version" "cloudflare_token" {
+  secret = "cloudflare-token"
+}
+data "google_secret_manager_secret_version" "cloudflare_domain" {
+  secret = "cloudflare-domain"
+}
+
+locals {
+  cloudflare_zone    = data.google_secret_manager_secret_version.cloudflare_zone.secret_data
+  cloudflare_token   = data.google_secret_manager_secret_version.cloudflare_token.secret_data
+  cloudflare_domain  = data.google_secret_manager_secret_version.cloudflare_domain.secret_data
+  cloudflare_fdomain = replace(data.google_secret_manager_secret_version.cloudflare_domain.secret_data, ".", "-")
+}
+
 # Gets access to the already created cluster
 # https://www.terraform.io/docs/providers/google/d/container_cluster.html
 data "google_container_cluster" "app_cluster" {
@@ -8,13 +27,13 @@ data "google_container_cluster" "app_cluster" {
 # Retrieves the cert from the secret store
 # https://www.terraform.io/docs/providers/google/d/secret_manager_secret_version.html
 data "google_secret_manager_secret_version" "domain_cert" {
-  secret = "${replace(var.cloudflare_domain, ".", "-")}-cert"
+  secret = "${local.cloudflare_fdomain}-cert"
 }
 
 # Retrieves the key from the secret store
 # https://www.terraform.io/docs/providers/google/d/secret_manager_secret_version.html
 data "google_secret_manager_secret_version" "domain_key" {
-  secret = "${replace(var.cloudflare_domain, ".", "-")}-key"
+  secret = "${local.cloudflare_fdomain}-key"
 }
 
 # Adds the required k8s tls secrets from the secret store
@@ -22,7 +41,7 @@ data "google_secret_manager_secret_version" "domain_key" {
 resource "kubernetes_secret" "tls_secret" {
 
   metadata {
-    name = "${var.cloudflare_domain}.tls"
+    name = "${local.cloudflare_domain}.tls"
   }
 
   data = {
@@ -48,7 +67,7 @@ resource "kubernetes_ingress" "app_ingress" {
 
   spec {
     tls {
-      secret_name = "${var.cloudflare_domain}.tls"
+      secret_name = kubernetes_secret.tls_secret.metadata[0].name
     }
     rule {
       host = cloudflare_record.api_record.hostname
@@ -76,7 +95,7 @@ resource "google_compute_global_address" "app_cluster_ip" {
 # Creates a DNS entry
 # https://www.terraform.io/docs/providers/cloudflare/r/record.html
 resource "cloudflare_record" "api_record" {
-  zone_id = var.cloudflare_zone
+  zone_id = local.cloudflare_zone
   name    = "api"
   value   = google_compute_global_address.app_cluster_ip.address
   type    = "A"
@@ -87,7 +106,7 @@ resource "cloudflare_record" "api_record" {
 # https://www.terraform.io/docs/providers/cloudflare/r/zone_settings_override.html
 resource "cloudflare_zone_settings_override" "settings" {
 
-  zone_id = var.cloudflare_zone
+  zone_id = local.cloudflare_zone
   settings {
     always_online            = "on"
     ssl                      = "strict"

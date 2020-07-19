@@ -11,7 +11,7 @@ import (
 
 func TestUTDefaults(t *testing.T) {
 	c := NewConfigurator("", "")
-	assert.Equal(t, c.Env, "prod")
+	assert.Equal(t, c.Env, "io")
 	assert.Equal(t, c.Location, "/config")
 }
 
