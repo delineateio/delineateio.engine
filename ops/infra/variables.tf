@@ -10,6 +10,11 @@ variable "app_cidr_range" {
   default = "10.2.0.0/16"
 }
 
+variable "machine_type" {
+  type    = string
+  default = "n1-standard-2"
+}
+
 # Cloudflare domain
 variable "cloudflare_domain" {
   type = string

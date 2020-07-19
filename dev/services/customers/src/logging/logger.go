@@ -20,6 +20,7 @@ func NewLogger(config string) *Logger {
 	return &Logger{
 		DefaultLevel: zapcore.WarnLevel,
 		Level:        getLevel(config),
+		Config:       config,
 	}
 }
 
@@ -27,6 +28,7 @@ func NewLogger(config string) *Logger {
 type Logger struct {
 	DefaultLevel zapcore.Level
 	Level        zapcore.Level
+	Config       string
 }
 
 func getLevel(config string) zapcore.Level {
@@ -61,7 +63,8 @@ func (l *Logger) Load() {
 
 	logger, _ := cfg.Build()
 	zap.ReplaceGlobals(logger)
-	Info("logger.initialised", "the logger level has been set")
+
+	Info("logger.initialised", "the logger level has been set to '"+l.Config+"'")
 }
 
 // Debug writes a debug message to the underlying logger

@@ -61,7 +61,7 @@ resource "google_container_node_pool" "app_cluster_nodes" {
 
   node_config {
     preemptible  = true
-    machine_type = "n1-standard-1"
+    machine_type = var.machine_type
 
     metadata = {
       disable-legacy-endpoints = "true"

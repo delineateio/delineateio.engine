@@ -74,6 +74,8 @@ func GetBool(key string, defaultValue bool) bool {
 			l.Error(key, err)
 			return defaultValue
 		}
+
+		l.Debug(key, strconv.FormatBool(value))
 		return value
 	}
 
@@ -84,10 +86,12 @@ func GetBool(key string, defaultValue bool) bool {
 // GetString gets the value from Viper
 func GetString(key, defaultValue string) string {
 	if viper.IsSet(key) {
-		return viper.GetString(key)
+		value := viper.GetString(key)
+		l.Debug(key, value)
+		return value
 	}
 
-	l.Warn(key, "not found in the configuration file, using default")
+	l.Debug(key, "not found in the configuration file, using default")
 	return defaultValue
 }
 
@@ -101,10 +105,11 @@ func GetInt(key string, defaultNumber int) int {
 			return defaultNumber
 		}
 
+		l.Debug(key, strconv.Itoa(number))
 		return number
 	}
 
-	l.Warn(key, "not found in the configuration file, using default")
+	l.Debug(key, "not found in the configuration file, using default")
 	return defaultNumber
 }
 
@@ -118,10 +123,12 @@ func GetDuration(key string, defaultDuration time.Duration) time.Duration {
 			l.Error(key, err)
 			return defaultDuration
 		}
+
+		l.Debug(key, duration.String())
 		return duration
 	}
 
-	l.Warn(key, "not found in the configuration file, using default")
+	l.Debug(key, "not found in the configuration file, using default")
 	return defaultDuration
 }
 
@@ -134,10 +141,12 @@ func GetUint(key string, defaultNumber uint) uint {
 			l.Error(key, err)
 			return defaultNumber
 		}
+
+		l.Debug(key, strconv.Itoa(int(number)))
 		return uint(number)
 	}
 
-	l.Warn(key, "not found in the configuration file, using default")
+	l.Debug(key, "not found in the configuration file, using default")
 	return defaultNumber
 }
 

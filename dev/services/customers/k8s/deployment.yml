@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customers
+spec:
+  selector:
+    matchLabels:
+      run: customers
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: customers
+    spec:
+      imagePullSecrets:
+      - name: registry
+      containers:
+      - name: api
+        image: customers
+        ports:
+        - containerPort: 1102
+        env:
+        - name: ENV
+          value: "dev"
+        - name: LOCATION
+          value: "/config"
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "200m"
+          limits:
+            memory: "64Mi"
+            cpu: "400m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 1102
+          failureThreshold: 1
+          periodSeconds: 20
+        startupProbe:
+          httpGet:
+            path: /
+            port: 1102
+          failureThreshold: 30
+          periodSeconds: 5
+
+      - name: database
+        image: postgres:11.6
+        ports:
+          - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        - name: POSTGRES_DB
+          value: postgres
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "200m"
+          limits:
+            memory: "64Mi"
+            cpu: "400m"

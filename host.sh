@@ -16,7 +16,7 @@ function installCARoot() {
     # Adds the certificate
     BASEDIR=$(dirname "$0")
     export CAROOT="${BASEDIR}/vm/certs"
-    sudo mkcert -uninstall
+    # sudo mkcert -uninstall
     sudo mkcert -install
 }
 

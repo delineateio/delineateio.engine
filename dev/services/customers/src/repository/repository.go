@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -182,6 +183,9 @@ func (r *Repository) Open() error {
 		},
 		retry.Attempts(r.Attempts),
 		retry.Delay(r.Delay),
+		retry.OnRetry(func(n uint, err error) {
+			l.Info("db.open.error", "failed on attempt "+fmt.Sprint(n))
+		}),
 	)
 	if err != nil {
 		l.Error("db.open.error", err)

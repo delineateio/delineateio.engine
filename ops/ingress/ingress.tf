@@ -56,8 +56,8 @@ resource "kubernetes_ingress" "app_ingress" {
         path {
           path = "/*"
           backend {
-            service_name = "customer-service"
-            service_port = 1102
+            service_name = "customers"
+            service_port = 80
           }
         }
       }

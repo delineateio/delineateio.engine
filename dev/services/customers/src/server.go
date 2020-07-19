@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	s "github.com/delineateio/core/server"
 	"github.com/gin-gonic/gin"
 
@@ -10,10 +8,8 @@ import (
 )
 
 func main() {
-	server := s.NewServer(getRoutes, NewCustomerRepository())
-	server.Env = os.Getenv("ENV")
-	server.Location = os.Getenv("LOCATION")
-	server.Configure()
+	server := s.NewServer(getRoutes)
+	server.Repository = NewCustomerRepository()
 	server.Start()
 }
 
