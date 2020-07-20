@@ -9,7 +9,7 @@
   tasks:
 
    # TODO: This needs to be locked to a specific version - this could drift!
-   # https://github.com/ansible/role-install-gcloud
+   # https://cloud.google.com/sdk/docs/downloads-versioned-archives
    - name: Install GCloud
      when: ansible_local.gcloud.installed == false
      shell: |
