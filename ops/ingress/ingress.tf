@@ -41,7 +41,7 @@ data "google_secret_manager_secret_version" "domain_key" {
 resource "kubernetes_secret" "tls_secret" {
 
   metadata {
-    name = "${local.cloudflare_domain}.tls"
+    name = "${local.cloudflare_fdomain}-tls"
   }
 
   data = {
@@ -116,6 +116,12 @@ resource "cloudflare_zone_settings_override" "settings" {
     automatic_https_rewrites = "on"
     brotli                   = "on"
   }
+}
+
+# Accesses the published cloudflare
+# https://registry.terraform.io/providers/hashicorp/http/latest/docs
+data "http" "cloudflare_ip_ranges" {
+  url = "https://www.cloudflare.com/ips-v4"
 }
 
 # Outputs the IP endpoint for the cluster

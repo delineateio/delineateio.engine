@@ -31,14 +31,18 @@ commands:
           name: Install Bash
           command: apk add bash
   gcp_update:
+    parameters:
+      dir:
+        type: string
     steps:
       - run:
           name: Update Infrastructure
           command: |
             source ~/.env
-            cd ./ops/infra
+            cd << parameters.dir >>
             terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-            terraform plan -var-file="./env/${DELINEATEIO_ENV}.tfvars" -lock=true -refresh=true -out=plan.out
+            terraform plan -var-file="./env/${DELINEATEIO_ENV}.tfvars" \
+                              -lock=true -refresh=true -out=plan.out
             terraform apply -lock=true -refresh=true -auto-approve plan.out
 
 jobs:
@@ -52,7 +56,8 @@ jobs:
       - checkout
       - set_branch
       - gcp_key
-      - gcp_update
+      - gcp_update:
+          dir: ./ops/infra
 
   test_infrastructure:
     docker:
@@ -108,15 +113,8 @@ jobs:
       - add_bash
       - checkout
       - set_branch
-      - run:
-          name: Initialise Terraform
-          command: source ~/.env && cd ./ops/ingress && terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-      - run:
-          name: Plan Ingress
-          command: source ~/.env && cd ./ops/ingress && terraform plan -lock=true -refresh=true -out=plan.out
-      - run:
-          name: Apply Ingress
-          command: source ~/.env && cd ./ops/ingress && terraform apply -lock=true -refresh=true -auto-approve plan.out
+      - gcp_update:
+          dir: ./ops/ingress
 
 workflows:
   version: 2

@@ -45,7 +45,7 @@ spec:
           periodSeconds: 5
 
       - name: database
-        image: postgres:11.6
+        image: mirror.gcr.io/library/postgres:11.6
         ports:
           - containerPort: 5432
         env:

@@ -6,3 +6,5 @@
 .vagrant/
 *.pem
 *.todo
+
+# inspec.lock
