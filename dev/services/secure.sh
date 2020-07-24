@@ -1,20 +1,29 @@
 #!/usr/bin/env bash
 set -e
 
+###################################################################
+# Script Name	: secure.sh
+# Description	: Perfoms security testing on a docker image
+# Args          : $1 = Type of the component to deploy
+#               : $2 = Name of the component to deploy
+# Author       	: Jonathan Fenwick
+# Email         : jonathan.fenwick@delineate.io
+###################################################################
+
 clear
 ROOT="$(git rev-parse --show-toplevel)"
-SERVICE="${1:-customers}"
-FOLDER="${ROOT}/dev/services/${SERVICE}"
+COMPONENT_TYPE="${1}"
+COMPONENT_NAME="${2}"
+FOLDER="${ROOT}/dev/${COMPONENT_TYPE}}/${COMPONENT_NAME}"
 ENV="io" # Verifies the production config
 LOCATION="/config"
-PORT=$(yq r - 'server.port' < "${FOLDER}/config/${ENV}.yml")
-IMAGE_NAME="${SERVICE}:$(git rev-parse --short HEAD)-${ENV}"
+IMAGE_NAME="${COMPONENT_NAME}:$(git rev-parse --short HEAD)-${ENV}"
 
-echo "service:  ${DETAIL}${SERVICE}${RESET}"
-echo "env:      ${DETAIL}${ENV}${RESET}"
-echo "config:   ${DETAIL}${LOCATION}${RESET}"
-echo "port:     ${DETAIL}${PORT}${RESET}"
-echo "image:    ${DETAIL}${IMAGE_NAME}${RESET}"
+echo "Type:     ${DETAIL}${COMPONENT_TYPE}${RESET}"
+echo "Name:     ${DETAIL}${COMPONENT_NAME}${RESET}"
+echo "Env:      ${DETAIL}${ENV}${RESET}"
+echo "Config:   ${DETAIL}${LOCATION}${RESET}"
+echo "Image:    ${DETAIL}${IMAGE_NAME}${RESET}"
 echo
 
 cd "$FOLDER"

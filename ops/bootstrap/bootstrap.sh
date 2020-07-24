@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
+
+###################################################################
+# Script Name	: bootstrap.sh
+# Description	: Bootstraps a new environment for GCP & Cloudflare
+# Args          : $1 delineate.io environment
+#               : $2 GCP Project ID
+#               : $3 GCP Region
+#               : $4 Cloudflare Domain
+#               : $5 Cloudflare Token
+#               : $6 Cloudflare Zone
+# Author       	: Jonathan Fenwick
+# Email         : jonathan.fenwick@delineate.io
+###################################################################
+
+
 # bootstrap.sh
 #   dev
 #   io-delineate-engine-dev
@@ -38,6 +53,14 @@ gcloud config set compute/region "${REGION}"
 echo "${START}Creating Terraform state bucket...${RESET}"
 gsutil mb -c standard -b on -l "${REGION}" "gs://${PROJECT}-tf/"
 echo "${COMPLETE}Terraform state bucket created${RESET}"
+echo
+
+# ---------------------------------------------------------------------
+
+# Creates the bucket to track deployments
+echo "${START}Creating Deployments bucket...${RESET}"
+gsutil mb -c standard -b on -l "${REGION}" "gs://${PROJECT}-deployments/"
+echo "${COMPLETE}Deployments bucket created${RESET}"
 echo
 
 # ---------------------------------------------------------------------
