@@ -1,6 +1,6 @@
 Vagrant.require_version "=2.2.9"
 
-ansible_version   = "2.9.10"
+ansible_version   = "2.9.11"
 ansible_verbose   = false
 ansible_home      = "/home/vagrant/project/vm"
 
@@ -21,6 +21,7 @@ Vagrant.configure("2") do |config|
   # Changes the default project sync dir
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/home/vagrant/project"
+  config.vm.synced_folder "~/.gcloud/delineateio.engine/dev", "/home/vagrant/.gcloud/delineateio.engine/dev"
 
   core_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
