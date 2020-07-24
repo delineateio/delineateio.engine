@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
+###################################################################
+# Script Name	: host.sh
+# Description	: Configures the host after VM started
+# Args          : None
+# Author       	: Jonathan Fenwick
+# Email         : jonathan.fenwick@delineate.io
+###################################################################
+
 # Adds
 function addhost() {
 

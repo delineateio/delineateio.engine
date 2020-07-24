@@ -2,6 +2,7 @@
 .tmp/
 .env/
 .gcloud/
+.metadata/
 .terraform/
 .vagrant/
 *.pem

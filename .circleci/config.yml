@@ -44,8 +44,46 @@ commands:
             terraform plan -var-file="./env/${DELINEATEIO_ENV}.tfvars" \
                               -lock=true -refresh=true -out=plan.out
             terraform apply -lock=true -refresh=true -auto-approve plan.out
+  deploy:
+    parameters:
+      component_type:
+        type: string
+        default: "services"
+      component_name:
+        type: string
+        default: "customers"
+    steps:
+      - run:
+          name: Set GCP Project
+          command: source ~/.env && gcloud config set project $GOOGLE_PROJECT
+      - run:
+          name: Authenticate GCP Service Account
+          command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
+      - run:
+          name: Check Deployment
+          command: source ~/.env && bash ./.circleci/deploy_check.sh << parameters.component_type >> << parameters.component_name >>
+      - run:
+          name: Install GCP Components
+          command: gcloud components install kubectl skaffold --quiet
+      - run:
+          name: Install Container Structure Test
+          command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+      - run:
+          name: Add GKE Config
+          command: source ~/.env && gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE
+      - run:
+          name: Deploy to GKE
+          command: |
+            source ~/.env
+            cd ./dev/<< parameters.component_type >>/<< parameters.component_name >>
+            skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
+      - run:
+          name: Check Deployment
+          command: source ~/.env && bash ./.circleci/deploy_add.sh << parameters.component_type >> << parameters.component_name >>
+
 
 jobs:
+
   build_infrastructure:
     docker:
       - image: << pipeline.parameters.terraform-image >>
@@ -84,27 +122,6 @@ jobs:
       - setup_remote_docker
       - set_branch
       - gcp_key
-      - run:
-          name: Install GCP Components
-          command: gcloud components install kubectl skaffold --quiet
-      - run:
-          name: Install Container Structure Test
-          command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
-      - run:
-          name: Set GCP Project
-          command: source ~/.env && gcloud config set project $GOOGLE_PROJECT
-      - run:
-          name: Authenticate GCP Service Account
-          command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
-      - run:
-          name: Add GKE Config
-          command: source ~/.env && gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE
-      - run:
-          name: Deploy to GKE
-          command: |
-            source ~/.env
-            cd ./dev/services/customers
-            skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
 
   configure_ingress:
     docker:
