@@ -3,10 +3,10 @@ version: 2.1
 parameters:
   terraform-image:
     type: string
-    default: "hashicorp/terraform:0.12.28"
+    default: "hashicorp/terraform:0.12.29"
   gcloud-image:
     type: string
-    default: "google/cloud-sdk:300.0.0-alpine"
+    default: "google/cloud-sdk:302.0.0-alpine"
   ruby-image:
     type: string
     default: "circleci/ruby:2.5.1"
@@ -44,14 +44,12 @@ commands:
             terraform plan -var-file="./env/${DELINEATEIO_ENV}.tfvars" \
                               -lock=true -refresh=true -out=plan.out
             terraform apply -lock=true -refresh=true -auto-approve plan.out
-  deploy:
+  deploy_component:
     parameters:
       component_type:
         type: string
-        default: "services"
       component_name:
         type: string
-        default: "customers"
     steps:
       - run:
           name: Set GCP Project
@@ -81,7 +79,6 @@ commands:
           name: Check Deployment
           command: source ~/.env && bash ./.circleci/deploy_add.sh << parameters.component_type >> << parameters.component_name >>
 
-
 jobs:
 
   build_infrastructure:
@@ -95,7 +92,7 @@ jobs:
       - set_branch
       - gcp_key
       - gcp_update:
-          dir: ./ops/infra
+          dir: ./ops/cluster
 
   test_infrastructure:
     docker:
@@ -122,6 +119,9 @@ jobs:
       - setup_remote_docker
       - set_branch
       - gcp_key
+      - deploy_component:
+          component_type: "services"
+          component_name: "customers"
 
   configure_ingress:
     docker:
