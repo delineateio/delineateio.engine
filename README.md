@@ -9,6 +9,7 @@
 [![CircleCI](https://circleci.com/gh/delineateio/delineateio.engine.svg?style=shield)](https://circleci.com/gh/delineateio/delineateio.engine)
 [![codebeat badge](https://codebeat.co/badges/f382bda1-32b7-406a-b793-9ae515ae8e52)](https://codebeat.co/projects/github-com-delineateio-delineateio-engine-master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/delineateio/delineateio.engine)](https://goreportcard.com/report/gtithub.com/delineateio/delineateio.engine)
+![GitHub issues](https://img.shields.io/github/issues-raw/delineateio/delineateio.engine?color=orange)
 [![Github All Releases](https://img.shields.io/github/downloads/delineateio/delineateio.engine/total.svg)](https://github.com/delineateio/delineateio.engine/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,9 +23,15 @@ Once the project is more elaborated then PR will be actively encouraged.  You ca
 
 ## Local Development
 
-> Specific attention has been given minimise the effort required to setup up a working development environment.
+> Specific attention has been given minimise the effort required to setup up a working development environment as this is a common pain point for contributors.
 
 The development environment has been implemented by using [hashicorp vagrant](https://www.vagrantup.com/) an automatically configured VM with all the required tools imnstalled.  For more information on `vagrant` review the offical documentation.
+
+### GCP Service Account
+
+A GCP service account needs to be present for `dev` cloud environment.  This key should be present at `~/.gcloud/delineateio.engine/dev`.
+
+> During the VM provisioning the GCP key will be mounted and used for authentication, therefore if the key is not present in the rquired location provisioning will fail.
 
 ### Required Dependencies
 
