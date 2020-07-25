@@ -52,6 +52,9 @@ commands:
         type: string
     steps:
       - run:
+          name: "Get submodules"
+          command: git submodule update --init --recursive
+      - run:
           name: Set GCP Project
           command: source ~/.env && gcloud config set project $GOOGLE_PROJECT
       - run:
