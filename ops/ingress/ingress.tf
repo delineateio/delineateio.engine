@@ -128,3 +128,9 @@ data "http" "cloudflare_ip_ranges" {
 output "cluster_ip" {
   value = data.google_container_cluster.app_cluster.endpoint
 }
+
+
+# LB ingress output
+output "lb_ingress" {
+  value = kubernetes_ingress.app_ingress.load_balancer_ingress
+}
