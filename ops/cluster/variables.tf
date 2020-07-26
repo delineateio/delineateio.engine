@@ -11,3 +11,15 @@ variable "app_cidr_range" {
 variable "machine_type" {
   type = string
 }
+
+variable "min_node_count" {
+  type = number
+}
+
+variable "max_node_count" {
+  type = number
+}
+
+variable "max_surge" {
+  type = number
+}

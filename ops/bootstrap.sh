@@ -9,8 +9,8 @@ set -e
 #               : $2 GCP Project ID
 #               : $3 GCP Region
 #               : $4 Cloudflare Domain
-#               : $5 Cloudflare Token
-#               : $6 Cloudflare Zone
+#               : $5 Cloudflare Zone
+#               : $6 Cloudflare Token
 # Author       	: Jonathan Fenwick
 # Email         : jonathan.fenwick@delineate.io
 ###################################################################
@@ -18,7 +18,7 @@ set -e
 
 # bootstrap.sh
 #   dev
-#   io-delineate-engine-dev
+#   io-delineate-platform-dev
 #   europe-west2
 #   delineate.dev
 #   abc-token
@@ -29,19 +29,28 @@ echo
 [[ -z "$2" ]] && { echo "${WARN}GCP Project not provided${RESET}" ; exit 1; }
 [[ -z "$3" ]] && { echo "${WARN}GCP Region not provided${RESET}" ; exit 1; }
 [[ -z "$4" ]] && { echo "${WARN}Cloudflare Domain not provided${RESET}" ; exit 1; }
-[[ -z "$5" ]] && { echo "${WARN}Cloudflare Token not provided${RESET}" ; exit 1; }
-[[ -z "$6" ]] && { echo "${WARN}Cloudflare Zone not provided${RESET}" ; exit 1; }
+[[ -z "$5" ]] && { echo "${WARN}Cloudflare Zone not provided${RESET}" ; exit 1; }
+[[ -z "$6" ]] && { echo "${WARN}Cloudflare Token not provided${RESET}" ; exit 1; }
 
 # Sets variables
 ENV="${1}"
 PROJECT="${2}"
 REGION="${3}"
 CLOUDFLARE_DOMAIN="${4}"
-CLOUDFLARE_TOKEN="${5}"
-CLOUDFLARE_ZONE="${6}"
+CLOUDFLARE_ZONE="${5}"
+CLOUDFLARE_TOKEN="${6}"
 USER="infrastructure"
 SERVICE_ACCOUNT="${USER}@${PROJECT}.iam.gserviceaccount.com"
-KEY_FILE="$HOME/.gcloud/delineateio.engine/$ENV/key.json"
+KEY_FILE="$HOME/.gcloud/delineateio/platform/$ENV/key.json"
+
+echo
+echo "Env:      ${DETAIL}${ENV}${RESET}"
+echo "Project:  ${DETAIL}${PROJECT}${RESET}"
+echo "Region:   ${DETAIL}${REGION}${RESET}"
+echo "Domain:   ${DETAIL}${CLOUDFLARE_DOMAIN}${RESET}"
+echo "Account:  ${DETAIL}${SERVICE_ACCOUNT}${RESET}"
+echo "Key:      ${DETAIL}${KEY_FILE}${RESET}"
+echo
 
 # Changes config settings
 gcloud config set project "${PROJECT}"
@@ -57,18 +66,11 @@ echo
 
 # ---------------------------------------------------------------------
 
-# Creates the bucket to track deployments
-echo "${START}Creating Deployments bucket...${RESET}"
-gsutil mb -c standard -b on -l "${REGION}" "gs://${PROJECT}-deployments/"
-echo "${COMPLETE}Deployments bucket created${RESET}"
-echo
-
-# ---------------------------------------------------------------------
-
 # Create the service account
 echo "${START}Creating '${USER}' service account...${RESET}"
 gcloud iam service-accounts create ${USER} \
-    --description="This service account is used to provision infrastructure"
+    --display-name="Infrastructure" \
+    --description="Service account is used to provision infrastructure during CI/CD"
 echo "${COMPLETE}Service account created${RESET}"
 echo
 
@@ -102,10 +104,12 @@ echo "${START}Removing default fw rules and network...${RESET}"
 gcloud compute firewall-rules delete default-allow-icmp \
                                      default-allow-internal \
                                      default-allow-rdp \
-                                     default-allow-ssh
+                                     default-allow-ssh \
+                                     --quiet
 
-gcloud compute networks delete default
+gcloud compute networks delete default --quiet
 echo "${COMPLETE}Default network removed${RESET}"
+echo
 
 # ---------------------------------------------------------------------
 
@@ -124,6 +128,7 @@ echo "${CLOUDFLARE_ZONE}" | gcloud secrets create "cloudflare-zone" \
                             --data-file -
 
 echo "${START}Cloudflare secrets created${RESET}"
+echo
 
 # ---------------------------------------------------------------------
 
@@ -134,6 +139,6 @@ echo "${START}Creating service account key...${RESET}"
 gcloud iam service-accounts keys create "$KEY_FILE" \
                                 --iam-account "${SERVICE_ACCOUNT}"
 
-echo "${START}Creating service account token...${RESET}"
+echo "${START}Service account token created${RESET}"
 
 # ---------------------------------------------------------------------

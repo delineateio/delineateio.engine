@@ -45,8 +45,8 @@ resource "google_container_node_pool" "app_cluster_nodes" {
 
   initial_node_count = 1
   autoscaling {
-    min_node_count = 1
-    max_node_count = 3
+    min_node_count = var.min_node_count
+    max_node_count = var.max_node_count
   }
 
   management {
@@ -55,7 +55,7 @@ resource "google_container_node_pool" "app_cluster_nodes" {
   }
 
   upgrade_settings {
-    max_surge       = 3
+    max_surge       = var.max_surge
     max_unavailable = 1
   }
 
@@ -79,6 +79,7 @@ resource "google_container_node_pool" "app_cluster_nodes" {
 resource "google_service_account" "registry_service_account" {
   account_id   = "registry"
   display_name = "registry"
+  description  = "Service account for pulling images from GCR"
 }
 
 resource "google_project_iam_binding" "registry_iam_binding" {
