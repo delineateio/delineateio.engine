@@ -14,7 +14,7 @@ clear
 ROOT="$(git rev-parse --show-toplevel)"
 COMPONENT_TYPE="${1}"
 COMPONENT_NAME="${2}"
-FOLDER="${ROOT}/dev/${COMPONENT_TYPE}}/${COMPONENT_NAME}"
+FOLDER="${ROOT}/dev/${COMPONENT_TYPE}/${COMPONENT_NAME}"
 ENV="io" # Verifies the production config
 LOCATION="/config"
 IMAGE_NAME="${COMPONENT_NAME}:$(git rev-parse --short HEAD)-${ENV}"

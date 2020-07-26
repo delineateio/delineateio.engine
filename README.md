@@ -6,11 +6,9 @@
 
 #
 
-[![CircleCI](https://circleci.com/gh/delineateio/delineateio.engine.svg?style=shield)](https://circleci.com/gh/delineateio/delineateio.engine)
-[![codebeat badge](https://codebeat.co/badges/f382bda1-32b7-406a-b793-9ae515ae8e52)](https://codebeat.co/projects/github-com-delineateio-delineateio-engine-master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/delineateio/delineateio.engine)](https://goreportcard.com/report/gtithub.com/delineateio/delineateio.engine)
-![GitHub issues](https://img.shields.io/github/issues-raw/delineateio/delineateio.engine?color=orange)
-[![Github All Releases](https://img.shields.io/github/downloads/delineateio/delineateio.engine/total.svg)](https://github.com/delineateio/delineateio.engine/releases)
+[![CircleCI](https://circleci.com/gh/delineateio/platform.svg?style=shield)](https://circleci.com/gh/delineateio/platform)
+![GitHub issues](https://img.shields.io/github/issues-raw/delineateio/platform?color=orange)
+[![Github All Releases](https://img.shields.io/github/downloads/delineateio/platform/total.svg)](https://github.com/delineateio/platform/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Purpose
@@ -19,7 +17,7 @@ Delineate is a platform for taking business ideas to end users without losing cl
 
 Once the project is more elaborated then PR will be actively encouraged.  You can see more on the project standards [here](./docs/standards.md).
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg)](https://github.com/delineateio/delineateio.engine/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22+)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg)](https://github.com/delineateio/platform/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22+)
 
 ## Local Development
 
@@ -29,7 +27,7 @@ The development environment has been implemented by using [hashicorp vagrant](ht
 
 ### GCP Service Account
 
-A GCP service account needs to be present for `dev` cloud environment.  This key should be present at `~/.gcloud/delineateio.engine/dev`.
+A GCP service account needs to be present for `dev` cloud environment.  This key should be present at `~/.gcloud/delineateio/platform/dev`.
 
 > During the VM provisioning the GCP key will be mounted and used for authentication, therefore if the key is not present in the rquired location provisioning will fail.
 

@@ -30,13 +30,13 @@ commands:
       - run:
           name: Install Bash
           command: apk add bash
-  gcp_update:
+  gcp_apply:
     parameters:
       dir:
         type: string
     steps:
       - run:
-          name: Update Infrastructure
+          name: Apply Infrastructure
           command: |
             source ~/.env
             cd << parameters.dir >>
@@ -52,7 +52,7 @@ commands:
         type: string
     steps:
       - run:
-          name: "Get submodules"
+          name: Update Git Submodules
           command: git submodule update --init --recursive
       - run:
           name: Set GCP Project
@@ -61,7 +61,7 @@ commands:
           name: Authenticate GCP Service Account
           command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
       - run:
-          name: Check Deployment
+          name: Check Deployment Record
           command: source ~/.env && bash ./.circleci/deploy_check.sh << parameters.component_type >> << parameters.component_name >>
       - run:
           name: Install GCP Components
@@ -79,11 +79,22 @@ commands:
             cd ./dev/<< parameters.component_type >>/<< parameters.component_name >>
             skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
       - run:
-          name: Check Deployment
+          name: Add Deployment Record
           command: source ~/.env && bash ./.circleci/deploy_add.sh << parameters.component_type >> << parameters.component_name >>
+  gcp_destroy:
+    parameters:
+      dir:
+        type: string
+    steps:
+      - run:
+          name: Destroy
+          command: |
+            source ~/.env
+            cd << parameters.dir >>
+            terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
+            terraform destroy -var-file="./env/${DELINEATEIO_ENV}.tfvars" -auto-approve
 
 jobs:
-
   build_infrastructure:
     docker:
       - image: << pipeline.parameters.terraform-image >>
@@ -94,7 +105,7 @@ jobs:
       - checkout
       - set_branch
       - gcp_key
-      - gcp_update:
+      - gcp_apply:
           dir: ./ops/cluster
 
   test_infrastructure:
@@ -133,12 +144,24 @@ jobs:
       - add_bash
       - checkout
       - set_branch
-      - gcp_update:
+      - gcp_apply:
           dir: ./ops/ingress
+
+  destroy:
+    docker:
+      - image: << pipeline.parameters.terraform-image >>
+    steps:
+      - add_bash
+      - checkout
+      - set_branch
+      - gcp_destroy:
+          dir: ./ops/ingress
+      - gcp_destroy:
+          dir: ./ops/cluster
 
 workflows:
   version: 2
-  run:
+  up:
     jobs:
       - build_infrastructure
       - test_infrastructure:
@@ -151,3 +174,14 @@ workflows:
           requires:
             - test_infrastructure
             - deploy_app
+  down:
+    triggers:
+      - schedule:
+          cron: "0 1,4,7,10,13,16,19,22 * * *"
+          filters:
+            branches:
+              ignore: "master"
+    jobs:
+      - destroy
+
+    # This is where scheduled job goes

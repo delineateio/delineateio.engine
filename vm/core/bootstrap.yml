@@ -18,6 +18,12 @@
       update_cache: true
       cache_valid_time: 172800 # Two days
 
+   - name: Installs Node Source
+     shell: |
+      curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+     args:
+      warn: false
+
    - name: Common Dependencies
      apt:
       pkg:
@@ -41,6 +47,7 @@
        - g++=4:7.4.0-1ubuntu2.3
        - make=4.1-9.1ubuntu1
        - nginx=1.14.0-0ubuntu1.7
+       - nodejs=10.22.0-1nodesource1
       state: present
 
    - name: Install MkCert
@@ -48,10 +55,6 @@
       url: https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64
       dest: /usr/local/bin/mkcert
       mode: '0775'
-
-   - name: Install NPM
-     apt:
-      name: npm=3.5.2-0ubuntu4
 
    - name: Install PIP
      apt:

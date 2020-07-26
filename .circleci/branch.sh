@@ -4,13 +4,12 @@ set -e
 BRANCH="$CIRCLE_BRANCH"
 
 FOLDER=$(dirname "$0")
-pwd
 
 # Sets defaults
 cp "${FOLDER}/dev.env" ~/.env
 
-# TODO: Rename 'master' to 'io'
-# TODO: For now deploys master to .pub
+# TODO: For now this replays on top
+# of the dev env for cost purposes
 if [ "$BRANCH" == "master" ]
 then
     cp "${FOLDER}/pub.env" ~/.env

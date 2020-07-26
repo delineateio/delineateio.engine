@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
   # Changes the default project sync dir
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/home/vagrant/project"
-  config.vm.synced_folder "~/.gcloud/delineateio.engine/dev", "/home/vagrant/.gcloud/delineateio.engine/dev"
+  config.vm.synced_folder "~/.gcloud/delineateio/platform", "/home/vagrant/.gcloud/delineateio/platform"
 
   core_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
