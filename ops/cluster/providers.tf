@@ -6,7 +6,7 @@ terraform {
     cloudflare = "2.8.0"
   }
   backend "gcs" {
-    prefix = "terraform/state"
+    prefix = "terraform/cluster"
   }
 }
 

@@ -41,7 +41,7 @@ commands:
             source ~/.env
             cd << parameters.dir >>
             terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-            terraform plan -var-file="./env/${DELINEATEIO_ENV}.tfvars" \
+            terraform plan -var-file="../env/${DELINEATEIO_ENV}.tfvars" \
                               -lock=true -refresh=true -out=plan.out
             terraform apply -lock=true -refresh=true -auto-approve plan.out
   deploy_component:
@@ -61,7 +61,7 @@ commands:
           name: Authenticate GCP Service Account
           command: gcloud auth activate-service-account --key-file=/tmp/gcp.json
       - run:
-          name: Check Deployment Record
+          name: Compare Last Deployment
           command: source ~/.env && bash ./.circleci/deploy_check.sh << parameters.component_type >> << parameters.component_name >>
       - run:
           name: Install GCP Components
@@ -79,7 +79,7 @@ commands:
             cd ./dev/<< parameters.component_type >>/<< parameters.component_name >>
             skaffold run -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
       - run:
-          name: Add Deployment Record
+          name: Add New Deployment
           command: source ~/.env && bash ./.circleci/deploy_add.sh << parameters.component_type >> << parameters.component_name >>
   gcp_destroy:
     parameters:
@@ -92,10 +92,23 @@ commands:
             source ~/.env
             cd << parameters.dir >>
             terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-            terraform destroy -var-file="./env/${DELINEATEIO_ENV}.tfvars" -auto-approve
+            terraform destroy -var-file="../env/${DELINEATEIO_ENV}.tfvars" -auto-approve
 
 jobs:
-  build_infrastructure:
+  apply_network:
+    docker:
+      - image: << pipeline.parameters.terraform-image >>
+    environment:
+      BASH_ENV: "~/.bash_profile"
+    steps:
+      - add_bash
+      - checkout
+      - set_branch
+      - gcp_key
+      - gcp_apply:
+          dir: ./ops/network
+
+  apply_cluster:
     docker:
       - image: << pipeline.parameters.terraform-image >>
     environment:
@@ -137,7 +150,7 @@ jobs:
           component_type: "services"
           component_name: "customers"
 
-  configure_ingress:
+  apply_ingress:
     docker:
       - image: << pipeline.parameters.terraform-image >>
     steps:
@@ -163,14 +176,17 @@ workflows:
   version: 2
   up:
     jobs:
-      - build_infrastructure
+      - apply_network
+      - apply_cluster:
+          requires:
+            - apply_network
       - test_infrastructure:
           requires:
-            - build_infrastructure
+            - apply_cluster
       - deploy_app:
           requires:
-            - build_infrastructure
-      - configure_ingress:
+            - apply_cluster
+      - apply_ingress:
           requires:
             - test_infrastructure
             - deploy_app

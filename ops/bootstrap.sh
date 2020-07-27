@@ -8,9 +8,6 @@ set -e
 # Args          : $1 delineate.io environment
 #               : $2 GCP Project ID
 #               : $3 GCP Region
-#               : $4 Cloudflare Domain
-#               : $5 Cloudflare Zone
-#               : $6 Cloudflare Token
 # Author       	: Jonathan Fenwick
 # Email         : jonathan.fenwick@delineate.io
 ###################################################################
@@ -21,24 +18,16 @@ set -e
 #   io-delineate-platform-dev
 #   europe-west2
 #   delineate.dev
-#   abc-token
-#   abc-zone
 
 echo
 [[ -z "$1" ]] && { echo "${WARN}Environment not provided${RESET}" ; exit 1; }
 [[ -z "$2" ]] && { echo "${WARN}GCP Project not provided${RESET}" ; exit 1; }
 [[ -z "$3" ]] && { echo "${WARN}GCP Region not provided${RESET}" ; exit 1; }
-[[ -z "$4" ]] && { echo "${WARN}Cloudflare Domain not provided${RESET}" ; exit 1; }
-[[ -z "$5" ]] && { echo "${WARN}Cloudflare Zone not provided${RESET}" ; exit 1; }
-[[ -z "$6" ]] && { echo "${WARN}Cloudflare Token not provided${RESET}" ; exit 1; }
 
 # Sets variables
 ENV="${1}"
 PROJECT="${2}"
 REGION="${3}"
-CLOUDFLARE_DOMAIN="${4}"
-CLOUDFLARE_ZONE="${5}"
-CLOUDFLARE_TOKEN="${6}"
 USER="infrastructure"
 SERVICE_ACCOUNT="${USER}@${PROJECT}.iam.gserviceaccount.com"
 KEY_FILE="$HOME/.gcloud/delineateio/platform/$ENV/key.json"
@@ -47,7 +36,6 @@ echo
 echo "Env:      ${DETAIL}${ENV}${RESET}"
 echo "Project:  ${DETAIL}${PROJECT}${RESET}"
 echo "Region:   ${DETAIL}${REGION}${RESET}"
-echo "Domain:   ${DETAIL}${CLOUDFLARE_DOMAIN}${RESET}"
 echo "Account:  ${DETAIL}${SERVICE_ACCOUNT}${RESET}"
 echo "Key:      ${DETAIL}${KEY_FILE}${RESET}"
 echo
@@ -115,17 +103,17 @@ echo
 
 echo "${START}Creating Cloudflare secrets...${RESET}"
 
-echo "${CLOUDFLARE_DOMAIN}" | gcloud secrets create "cloudflare-domain" \
+gcloud secrets create "cloudflare-domain" \
                             --replication-policy "automatic" \
-                            --data-file -
+                            --data-file ".secure/domain"
 
-echo "${CLOUDFLARE_TOKEN}" | gcloud secrets create "cloudflare-token" \
+gcloud secrets create "cloudflare-token" \
                             --replication-policy "automatic" \
-                            --data-file -
+                            --data-file ".secure/token"
 
-echo "${CLOUDFLARE_ZONE}" | gcloud secrets create "cloudflare-zone" \
+gcloud secrets create "cloudflare-zone" \
                             --replication-policy "automatic" \
-                            --data-file -
+                            --data-file ".secure/zone"
 
 echo "${START}Cloudflare secrets created${RESET}"
 echo

@@ -5,6 +5,7 @@
 .metadata/
 .terraform/
 .vagrant/
+.secure/
 *.pem
 *.todo
 
