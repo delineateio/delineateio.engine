@@ -121,23 +121,6 @@ jobs:
       - gcp_apply:
           dir: ./ops/cluster
 
-  test_infrastructure:
-    docker:
-      - image: << pipeline.parameters.ruby-image >>
-    steps:
-      - checkout
-      - set_branch
-      - gcp_key
-      - run:
-          name: Install InSpec
-          command: gem install inspec-bin -v << pipeline.parameters.inspec-version >>
-      - run:
-          name: Run InSpec
-          command: |
-            source ~/.env
-            cd ./ops/tests
-            inspec exec . -t gcp:// --chef-license=accept-no-persist --input gcp_project_id=$GOOGLE_PROJECT
-
   deploy_app:
     docker:
       - image: << pipeline.parameters.gcloud-image >>
@@ -160,6 +143,27 @@ jobs:
       - gcp_apply:
           dir: ./ops/ingress
 
+  test_infrastructure:
+    docker:
+      - image: << pipeline.parameters.ruby-image >>
+    steps:
+      - checkout
+      - set_branch
+      - gcp_key
+      - run:
+          name: Install InSpec
+          command: gem install inspec-bin -v << pipeline.parameters.inspec-version >>
+      - run:
+          name: Run InSpec
+          command: |
+            source ~/.env
+            cd ./ops/tests
+            inspec exec . -t gcp:// \
+                      --chef-license=accept-no-persist \
+                      --input gcp_project_id=$GOOGLE_PROJECT \
+                              gcp_region=$GOOGLE_REGION \
+                              gcp_zone=$GOOGLE_ZONE
+
   destroy:
     docker:
       - image: << pipeline.parameters.terraform-image >>
@@ -180,20 +184,20 @@ workflows:
       - apply_cluster:
           requires:
             - apply_network
-      - test_infrastructure:
-          requires:
-            - apply_cluster
       - deploy_app:
           requires:
             - apply_cluster
       - apply_ingress:
           requires:
-            - test_infrastructure
             - deploy_app
+      - test_infrastructure:
+          requires:
+            - apply_ingress
+
   down:
     triggers:
       - schedule:
-          cron: "0 1,4,7,10,13,16,19,22 * * *"
+          cron: "0 1,4,7,17 * * *"
           filters:
             branches:
               ignore: "master"
