@@ -117,20 +117,3 @@ resource "cloudflare_zone_settings_override" "settings" {
     brotli                   = "on"
   }
 }
-
-# Accesses the published cloudflare
-# https://registry.terraform.io/providers/hashicorp/http/latest/docs
-data "http" "cloudflare_ip_ranges" {
-  url = "https://www.cloudflare.com/ips-v4"
-}
-
-# Outputs the IP endpoint for the cluster
-output "cluster_ip" {
-  value = data.google_container_cluster.app_cluster.endpoint
-}
-
-
-# LB ingress output
-output "lb_ingress" {
-  value = kubernetes_ingress.app_ingress.load_balancer_ingress
-}

@@ -1,3 +1,15 @@
+# Gets a reference to the network
+# https://www.terraform.io/docs/providers/google/d/compute_network.html
+data "google_compute_network" "app_network" {
+  name = "app-network"
+}
+
+# Gets a referenece to the subnetwork
+# https://www.terraform.io/docs/providers/google/d/compute_subnetwork.html
+data "google_compute_subnetwork" "app_subnet" {
+  name = "app-subnet-${data.google_client_config.context.region}"
+}
+
 # Select the available version for the cluster
 # https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
 data "google_container_engine_versions" "app_cluster_version" {
@@ -12,8 +24,8 @@ resource "google_container_cluster" "app_cluster" {
   name               = "app-cluster"
   description        = "Cluster for application hosting"
   location           = data.google_client_config.context.zone
-  network            = google_compute_network.app_network.self_link
-  subnetwork         = google_compute_subnetwork.app_subnet.self_link
+  network            = data.google_compute_network.app_network.self_link
+  subnetwork         = data.google_compute_subnetwork.app_subnet.self_link
   min_master_version = data.google_container_engine_versions.app_cluster_version.latest_node_version
 
   # Replaces with node pool after creation
