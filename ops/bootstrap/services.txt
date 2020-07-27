@@ -1,4 +1,5 @@
 cloudresourcemanager.googleapis.com
 container.googleapis.com
+containerscanning.googleapis.com
 compute.googleapis.com
 secretmanager.googleapis.com

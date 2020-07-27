@@ -106,7 +106,7 @@ jobs:
       - set_branch
       - gcp_key
       - gcp_apply:
-          dir: ./ops/network
+          dir: ./ops/cloud/network
 
   apply_cluster:
     docker:
@@ -119,7 +119,7 @@ jobs:
       - set_branch
       - gcp_key
       - gcp_apply:
-          dir: ./ops/cluster
+          dir: ./ops/cloud/cluster
 
   deploy_app:
     docker:
@@ -141,7 +141,7 @@ jobs:
       - checkout
       - set_branch
       - gcp_apply:
-          dir: ./ops/ingress
+          dir: ./ops/cloud/ingress
 
   test_infrastructure:
     docker:
@@ -172,9 +172,9 @@ jobs:
       - checkout
       - set_branch
       - gcp_destroy:
-          dir: ./ops/ingress
+          dir: ./ops/cloud/ingress
       - gcp_destroy:
-          dir: ./ops/cluster
+          dir: ./ops/cloud/cluster
 
 workflows:
   version: 2
