@@ -10,6 +10,10 @@ set -e
 # Email         : jonathan.fenwick@delineate.io
 ###################################################################
 
+# Validates inputs
+[[ -z "$1" ]] && { echo "${WARN}Component type not provided${RESET}" ; exit 1; }
+[[ -z "$2" ]] && { echo "${WARN}Component name not provided${RESET}" ; exit 1; }
+
 clear
 ROOT="$(git rev-parse --show-toplevel)"
 COMPONENT_TYPE="${1}"
