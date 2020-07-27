@@ -58,7 +58,7 @@ echo
 echo "${START}Creating '${USER}' service account...${RESET}"
 gcloud iam service-accounts create ${USER} \
     --display-name="Infrastructure" \
-    --description="Service account is used to provision infrastructure during CI/CD"
+    --description="Service account used to provision infrastructure during CI/CD"
 echo "${COMPLETE}Service account created${RESET}"
 echo
 

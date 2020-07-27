@@ -80,3 +80,4 @@
       name: inspec-bin
       version: 4.21.3
       state: present
+     become_user: vagrant
