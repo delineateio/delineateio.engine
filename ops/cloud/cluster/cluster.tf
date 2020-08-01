@@ -1,3 +1,11 @@
+# Loads into locals for less typing :)
+# https://www.terraform.io/docs/configuration/locals.html
+locals {
+  project = data.google_client_config.context.project
+  region  = data.google_client_config.context.region
+  zone    = data.google_client_config.context.zone
+}
+
 # Gets a reference to the network
 # https://www.terraform.io/docs/providers/google/d/compute_network.html
 data "google_compute_network" "app_network" {
@@ -7,14 +15,14 @@ data "google_compute_network" "app_network" {
 # Gets a referenece to the subnetwork
 # https://www.terraform.io/docs/providers/google/d/compute_subnetwork.html
 data "google_compute_subnetwork" "app_subnet" {
-  name = "app-subnet-${data.google_client_config.context.region}"
+  name = "app-subnet-${local.region}"
 }
 
 # Select the available version for the cluster
 # https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
 data "google_container_engine_versions" "app_cluster_version" {
-  location       = data.google_client_config.context.zone
-  version_prefix = "1.16."
+  location       = local.zone
+  version_prefix = var.cluster_version_prefix
 }
 
 # Cluster for hosting apps
@@ -23,7 +31,7 @@ resource "google_container_cluster" "app_cluster" {
 
   name               = "app-cluster"
   description        = "Cluster for application hosting"
-  location           = data.google_client_config.context.zone
+  location           = local.zone
   network            = data.google_compute_network.app_network.self_link
   subnetwork         = data.google_compute_subnetwork.app_subnet.self_link
   min_master_version = data.google_container_engine_versions.app_cluster_version.latest_node_version
@@ -31,6 +39,11 @@ resource "google_container_cluster" "app_cluster" {
   # Replaces with node pool after creation
   remove_default_node_pool = true
   initial_node_count       = 1
+
+  # Enable Workload Identity
+  workload_identity_config {
+    identity_namespace = "${local.project}.svc.id.goog"
+  }
 
   master_auth {
 
@@ -51,14 +64,16 @@ resource "google_container_cluster" "app_cluster" {
 
 resource "google_container_node_pool" "app_cluster_nodes" {
 
+  # TODO: To remove once workload_metadata_config available in 'google' provider
+  provider = google-beta
   name     = "app-cluster-node-pool"
-  location = data.google_client_config.context.zone
+  location = local.zone
   cluster  = google_container_cluster.app_cluster.name
 
   initial_node_count = 1
   autoscaling {
-    min_node_count = var.min_node_count
-    max_node_count = var.max_node_count
+    min_node_count = var.cluster_min_node_count
+    max_node_count = var.cluster_max_node_count
   }
 
   management {
@@ -67,16 +82,20 @@ resource "google_container_node_pool" "app_cluster_nodes" {
   }
 
   upgrade_settings {
-    max_surge       = var.max_surge
-    max_unavailable = 1
+    max_surge       = var.cluster_max_surge
+    max_unavailable = var.cluster_max_unavailable
   }
 
   node_config {
     preemptible  = true
-    machine_type = var.machine_type
+    machine_type = var.cluster_machine_type
 
     metadata = {
       disable-legacy-endpoints = "true"
+    }
+
+    workload_metadata_config {
+      node_metadata = "GKE_METADATA_SERVER"
     }
 
     oauth_scopes = [
@@ -86,12 +105,40 @@ resource "google_container_node_pool" "app_cluster_nodes" {
   }
 }
 
+# TODO: In the future the workload identity should be managed within the service
+
+# Creates the service account to use when pulling images
+# https://www.terraform.io/docs/providers/google/r/google_service_account.html
+resource "google_service_account" "workload" {
+  account_id   = "workload"
+  display_name = "Workload identity service account"
+  description  = "Service account used for running workloads in the app cluster"
+}
+
+# Creates the k8s service account
+# https://www.terraform.io/docs/providers/kubernetes/r/service_account.html
+resource "kubernetes_service_account" "workload" {
+  metadata {
+    name = "workload"
+    annotations = {
+      "iam.gke.io/gcp-service-account" = google_service_account.workload.email
+    }
+  }
+}
+
+# Binds the service account to workload account
+resource "google_service_account_iam_member" "workload_iam_member" {
+  service_account_id = google_service_account.workload.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${local.project}.svc.id.goog[default/workload]"
+}
+
 # Creates the service account to use when pulling images
 # https://www.terraform.io/docs/providers/google/r/google_service_account.html
 resource "google_service_account" "registry_service_account" {
   account_id   = "registry"
-  display_name = "registry"
-  description  = "Service account for pulling images from GCR"
+  display_name = "Registry image pull service account"
+  description  = "Service account for pulling images from GCR to GKE"
 }
 
 resource "google_project_iam_binding" "registry_iam_binding" {

@@ -1,9 +1,13 @@
 # This is an entrypoint
+
+# TODO: Google beta was required to setup the cluster
+# for workload identity
 terraform {
   required_providers {
-    google     = "3.28"
-    kubernetes = "1.11.3"
-    cloudflare = "2.8.0"
+    google      = "3.32.0"
+    google-beta = "3.32.0"
+    kubernetes  = "1.11.3"
+    cloudflare  = "2.8.0"
   }
   backend "gcs" {
     prefix = "terraform/cluster"

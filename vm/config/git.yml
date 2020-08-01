@@ -14,6 +14,7 @@
      with_items:
       - user.name ${GIT_NAME}
       - user.email ${GIT_EMAIL}
+      - alias.pretty log --pretty=oneline --abbrev-commit -n 10
 
    - name: Check for Secrets Baseline
      local_action: stat path=.secrets.baseline

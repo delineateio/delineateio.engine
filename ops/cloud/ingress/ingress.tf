@@ -6,15 +6,11 @@ data "google_secret_manager_secret_version" "cloudflare_zone" {
 data "google_secret_manager_secret_version" "cloudflare_token" {
   secret = "cloudflare-token"
 }
-data "google_secret_manager_secret_version" "cloudflare_domain" {
-  secret = "cloudflare-domain"
-}
 
 locals {
-  cloudflare_zone    = data.google_secret_manager_secret_version.cloudflare_zone.secret_data
-  cloudflare_token   = data.google_secret_manager_secret_version.cloudflare_token.secret_data
-  cloudflare_domain  = data.google_secret_manager_secret_version.cloudflare_domain.secret_data
-  cloudflare_fdomain = replace(data.google_secret_manager_secret_version.cloudflare_domain.secret_data, ".", "-")
+  cloudflare_zone  = data.google_secret_manager_secret_version.cloudflare_zone.secret_data
+  cloudflare_token = data.google_secret_manager_secret_version.cloudflare_token.secret_data
+  domain           = replace(var.domain, ".", "-")
 }
 
 # Gets access to the already created cluster
@@ -27,13 +23,13 @@ data "google_container_cluster" "app_cluster" {
 # Retrieves the cert from the secret store
 # https://www.terraform.io/docs/providers/google/d/secret_manager_secret_version.html
 data "google_secret_manager_secret_version" "domain_cert" {
-  secret = "${local.cloudflare_fdomain}-cert"
+  secret = "${local.domain}-cert"
 }
 
 # Retrieves the key from the secret store
 # https://www.terraform.io/docs/providers/google/d/secret_manager_secret_version.html
 data "google_secret_manager_secret_version" "domain_key" {
-  secret = "${local.cloudflare_fdomain}-key"
+  secret = "${local.domain}-key"
 }
 
 # Adds the required k8s tls secrets from the secret store
@@ -41,7 +37,7 @@ data "google_secret_manager_secret_version" "domain_key" {
 resource "kubernetes_secret" "tls_secret" {
 
   metadata {
-    name = "${local.cloudflare_fdomain}-tls"
+    name = "${local.domain}-tls"
   }
 
   data = {

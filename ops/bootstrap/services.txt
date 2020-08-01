@@ -1,5 +1,8 @@
 cloudresourcemanager.googleapis.com
 container.googleapis.com
 containerscanning.googleapis.com
+sqladmin.googleapis.com
 compute.googleapis.com
 secretmanager.googleapis.com
+iamcredentials.googleapis.com
+servicenetworking.googleapis.com

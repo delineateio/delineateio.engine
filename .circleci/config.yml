@@ -35,15 +35,21 @@ commands:
       dir:
         type: string
     steps:
+      - get_services # Get services for linking
       - run:
           name: Apply Infrastructure
           command: |
             source ~/.env
             cd << parameters.dir >>
             terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-            terraform plan -var-file="../env/${DELINEATEIO_ENV}.tfvars" \
-                              -lock=true -refresh=true -out=plan.out
-            terraform apply -lock=true -refresh=true -auto-approve plan.out
+            terraform plan -var-file="${TF_VARS}/${DELINEATEIO_ENV}.tfvars" \
+                              -lock=true -refresh=true -out="${TF_VARS}/plan.out"
+            terraform apply -lock=true -refresh=true -auto-approve "${TF_VARS}/plan.out"
+  get_services:
+    steps:
+      - run:
+          name: Update Git Submodules
+          command: git submodule update --init --recursive
   deploy_component:
     parameters:
       component_type:
@@ -51,9 +57,7 @@ commands:
       component_name:
         type: string
     steps:
-      - run:
-          name: Update Git Submodules
-          command: git submodule update --init --recursive
+      - get_services
       - run:
           name: Set GCP Project
           command: source ~/.env && gcloud config set project $GOOGLE_PROJECT
@@ -108,6 +112,19 @@ jobs:
       - gcp_apply:
           dir: ./ops/cloud/network
 
+  apply_db:
+    docker:
+      - image: << pipeline.parameters.terraform-image >>
+    environment:
+      BASH_ENV: "~/.bash_profile"
+    steps:
+      - add_bash
+      - checkout
+      - set_branch
+      - gcp_key
+      - gcp_apply:
+          dir: ./ops/cloud/db
+
   apply_cluster:
     docker:
       - image: << pipeline.parameters.terraform-image >>
@@ -121,7 +138,17 @@ jobs:
       - gcp_apply:
           dir: ./ops/cloud/cluster
 
-  deploy_app:
+  link_customers:
+    docker:
+      - image: << pipeline.parameters.terraform-image >>
+    steps:
+      - add_bash
+      - checkout
+      - set_branch
+      - gcp_apply:
+          dir: ./dev/services/customers/tf
+
+  deploy_customers:
     docker:
       - image: << pipeline.parameters.gcloud-image >>
     steps:
@@ -159,7 +186,7 @@ jobs:
             source ~/.env
             cd ./ops/tests
             inspec exec . -t gcp:// \
-                      --chef-license=accept-no-persist \
+                      --chef-license=accept-no-persist --no-color \
                       --input gcp_project_id=$GOOGLE_PROJECT \
                               gcp_region=$GOOGLE_REGION \
                               gcp_zone=$GOOGLE_ZONE
@@ -181,15 +208,22 @@ workflows:
   up:
     jobs:
       - apply_network
+      - apply_db:
+          requires:
+            - apply_network
       - apply_cluster:
           requires:
             - apply_network
-      - deploy_app:
+      - link_customers:
           requires:
+            - apply_db
             - apply_cluster
+      - deploy_customers:
+          requires:
+            - link_customers
       - apply_ingress:
           requires:
-            - deploy_app
+            - deploy_customers
       - test_infrastructure:
           requires:
             - apply_ingress
@@ -203,5 +237,3 @@ workflows:
               ignore: "master"
     jobs:
       - destroy
-
-    # This is where scheduled job goes

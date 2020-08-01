@@ -1,7 +1,7 @@
 # This is an entrypoint
 terraform {
   required_providers {
-    google     = "3.28"
+    google     = "3.32.0"
     kubernetes = "1.11.3"
     cloudflare = "2.8.0"
   }

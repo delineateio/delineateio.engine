@@ -57,7 +57,7 @@ echo
 # Create the service account
 echo "${START}Creating '${USER}' service account...${RESET}"
 gcloud iam service-accounts create ${USER} \
-    --display-name="Infrastructure" \
+    --display-name="Infrastructure automation service account" \
     --description="Service account used to provision infrastructure during CI/CD"
 echo "${COMPLETE}Service account created${RESET}"
 echo
@@ -102,10 +102,6 @@ echo
 # ---------------------------------------------------------------------
 
 echo "${START}Creating Cloudflare secrets...${RESET}"
-
-gcloud secrets create "cloudflare-domain" \
-                            --replication-policy "automatic" \
-                            --data-file ".secure/domain"
 
 gcloud secrets create "cloudflare-token" \
                             --replication-policy "automatic" \
