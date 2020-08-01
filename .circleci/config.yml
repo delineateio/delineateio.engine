@@ -99,6 +99,19 @@ commands:
             terraform destroy -var-file="../env/${DELINEATEIO_ENV}.tfvars" -auto-approve
 
 jobs:
+  enable_services:
+    docker:
+      - image: << pipeline.parameters.terraform-image >>
+    environment:
+      BASH_ENV: "~/.bash_profile"
+    steps:
+      - add_bash
+      - checkout
+      - set_branch
+      - gcp_key
+      - gcp_apply:
+          dir: ./ops/cloud/services
+
   apply_network:
     docker:
       - image: << pipeline.parameters.terraform-image >>
@@ -207,7 +220,10 @@ workflows:
   version: 2
   up:
     jobs:
-      - apply_network
+      - enable_services
+      - apply_network:
+          requires:
+            - enable_services
       - apply_db:
           requires:
             - apply_network

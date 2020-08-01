@@ -76,17 +76,6 @@ echo
 
 # ---------------------------------------------------------------------
 
-# Enable the required APIs
-echo "${START}Enabling API services...${RESET}"
-while read -r SERVICE; do
-    gcloud services enable "${SERVICE}"
-    echo "'${SERVICE}' enabled"
-done <services.txt
-echo "${COMPLETE}Services enabled${RESET}"
-echo
-
-# ---------------------------------------------------------------------
-
 echo "${START}Removing default fw rules and network...${RESET}"
 # Deletes the default firewall rules and network
 gcloud compute firewall-rules delete default-allow-icmp \
