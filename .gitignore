@@ -9,4 +9,20 @@
 *.pem
 *.todo
 
-# inspec.lock
+# Terraform
+# Local .terraform directories
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.logn
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+plan.out
+certs/
+
+# InSpec
+inspec.lock

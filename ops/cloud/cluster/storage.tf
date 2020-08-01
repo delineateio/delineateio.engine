@@ -13,7 +13,7 @@ resource "google_storage_bucket" "deployments" {
 
   lifecycle_rule {
     condition {
-      num_newer_versions = 3
+      num_newer_versions = var.cluster_deployment_versions
     }
     action {
       type = "Delete"

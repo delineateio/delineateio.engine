@@ -24,6 +24,7 @@ export RESET="$(tput sgr0)"
 # Defaults - enable compiled app
 export DELINEATEIO_ENV=dev
 export DELINEATEIO_LOCATION=../config
+export TF_VARS=/home/vagrant/project/.circleci/tf
 
 # Starts SSH sessions in the project folder and enables scripts
 cd ~/project || return
