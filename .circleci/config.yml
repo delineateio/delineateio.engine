@@ -38,6 +38,10 @@ commands:
       dir:
         type: string
     steps:
+      - add_bash
+      - checkout
+      - set_branch
+      - gcp_key
       - get_services # Get services for linking
       - run:
           name: Apply Infrastructure
@@ -60,6 +64,9 @@ commands:
       component_name:
         type: string
     steps:
+      - checkout
+      - set_branch
+      - gcp_key
       - get_services
       - run:
           name: Set GCP Project
@@ -70,6 +77,7 @@ commands:
       - run:
           name: Compare Last Deployment
           command: source ~/.env && bash ./.circleci/deploy_check.sh << parameters.component_type >> << parameters.component_name >>
+      - setup_remote_docker
       - run:
           name: Install GCP Components
           command: gcloud components install kubectl skaffold --quiet
@@ -108,10 +116,6 @@ jobs:
     environment:
       BASH_ENV: "~/.bash_profile"
     steps:
-      - add_bash
-      - checkout
-      - set_branch
-      - gcp_key
       - gcp_apply:
           dir: ./ops/cloud/services
 
@@ -121,10 +125,6 @@ jobs:
     environment:
       BASH_ENV: "~/.bash_profile"
     steps:
-      - add_bash
-      - checkout
-      - set_branch
-      - gcp_key
       - gcp_apply:
           dir: ./ops/cloud/network
 
@@ -134,10 +134,6 @@ jobs:
     environment:
       BASH_ENV: "~/.bash_profile"
     steps:
-      - add_bash
-      - checkout
-      - set_branch
-      - gcp_key
       - gcp_apply:
           dir: ./ops/cloud/db
 
@@ -147,10 +143,6 @@ jobs:
     environment:
       BASH_ENV: "~/.bash_profile"
     steps:
-      - add_bash
-      - checkout
-      - set_branch
-      - gcp_key
       - gcp_apply:
           dir: ./ops/cloud/cluster
 
@@ -158,9 +150,6 @@ jobs:
     docker:
       - image: << pipeline.parameters.terraform-image >>
     steps:
-      - add_bash
-      - checkout
-      - set_branch
       - gcp_apply:
           dir: ./dev/services/customers/tf
 
@@ -168,10 +157,6 @@ jobs:
     docker:
       - image: << pipeline.parameters.gcloud-image >>
     steps:
-      - checkout
-      - setup_remote_docker
-      - set_branch
-      - gcp_key
       - deploy_component:
           component_type: "services"
           component_name: "customers"
@@ -180,9 +165,6 @@ jobs:
     docker:
       - image: << pipeline.parameters.terraform-image >>
     steps:
-      - add_bash
-      - checkout
-      - set_branch
       - gcp_apply:
           dir: ./ops/cloud/ingress
 
@@ -207,20 +189,22 @@ jobs:
                               gcp_region=$GOOGLE_REGION \
                               gcp_zone=$GOOGLE_ZONE
 
-  customer_tests:
+  test_customers:
     docker:
       - image: << pipeline.parameters.python-image >>
     steps:
       - checkout
       - set_branch
+      - get_services
       - run:
-          name: Install Dependencies
-          command: pip3 install -r requirements.txt
+          name: Upgrade Pip
+          command: pip install --user --upgrade pip
       - run:
           name: Run Behave Tests
           command: |
             source ~/.env
             cd ./dev/services/customers/features
+            pip3 install --user -r requirements.txt
             behave -f pretty *.feature
 
   destroy:
@@ -263,12 +247,15 @@ workflows:
           requires:
             - apply_ingress
 
-  down:
-    triggers:
-      - schedule:
-          cron: "0 1,4,7,17 * * *"
-          filters:
-            branches:
-              ignore: "master"
-    jobs:
-      - destroy
+      - test_customers:
+          requires:
+            - apply_ingress
+#  down:
+#    triggers:
+#      - schedule:
+#          cron: "0 1,4,7,17 * * *"
+#          filters:
+#            branches:
+#              ignore: "master"
+#    jobs:
+#      - destroy
