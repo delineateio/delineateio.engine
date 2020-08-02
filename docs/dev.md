@@ -57,7 +57,6 @@ There are a number of environments that have been setup and defined through whic
 
 |Prefix|Domain|Description|Updated By|
 |---|---|---|---|
-|**local**|n/a|This environment is provided locally inside the development VM by the components installed and configured by `vagrant`.  Specifically this provides a `k8s` cluster using `microk8s`.  |Manual|
 |**dev**|delineate.dev|Cloud environment that can updated manually by developers and is updated by the CI/CD pipeline on a push to a non-controlled branch.|Manual & CircleCi|
 |**pub**|delineate.pub|Cloud published envoironment (a.k.a. pub) that is the pre-production staging environment.  The environment is controlled and can not be updated manually, it is updated by merging PR to the `main` branch|CircleCI|
 

@@ -8,16 +8,14 @@
   become: true
   tasks:
 
-   - name: Install Hashicorp Tools
+   - name: Install Terraform
+     when: ansible_local.terraform.installed == false
      shell: |
       mkdir -p ~/hashicorp
       cd ~/hashicorp
-      wget "https://releases.hashicorp.com/{{ item.tool }}/{{ item.version }}/{{ item.tool }}_{{ item.version }}_linux_amd64.zip"
-      unzip "{{ item.tool }}_{{ item.version }}_linux_amd64.zip"
-      sudo install "{{ item.tool }}" /usr/local/bin/
-     with_items:
-      - { tool: 'terraform', version: '0.12.29' }
-      - { tool: 'packer', version: '1.6.0' }
+      wget "https://releases.hashicorp.com/terraform/0.12.29/terraform_0.12.29_linux_amd64.zip"
+      unzip "terraform_0.12.29_linux_amd64.zip"
+      sudo install "terraform" /usr/local/bin/
      args:
       warn: false
 
@@ -33,12 +31,6 @@
       version: 1.346.0
       global: yes
 
-   - name: HTTP Status
-     npm:
-      name: stts
-      version: 1.1.0
-      global: yes
-
    - name: Install Trivy
      apt:
       deb: https://github.com/aquasecurity/trivy/releases/download/v0.9.1/trivy_0.9.1_Linux-64bit.deb
@@ -49,35 +41,40 @@
       channel: latest/stable
       state: present
 
-   - name: Install YQ
-     snap:
-      name: yq
-      channel: latest/stable
-      state: present
-
-   - name: Install Siege
-     apt:
-      name: siege=4.0.4-1build1
-      state: present
-
    - name: Install PSQL
      apt:
       name: postgresql-client=10+190ubuntu0.1
       state: present
 
-   - name: Install JQ
-     apt:
-      name: jq=1.5+dfsg-2
-      state: present
+   - name: Install Pre-Commit
+     when: ansible_local.pre_commit.installed == false
+     pip:
+      name: pre-commit==2.5.1
 
    - name: Install Shellcheck
      apt:
       name: shellcheck=0.4.6-1
       state: present
 
+   - name: Install Detect Secrets
+     pip:
+      name: detect-secrets==0.13.1
+
    - name: Install InSpec
      gem:
       name: inspec-bin
       version: 4.21.3
       state: present
+     become_user: vagrant
+
+   - name: Download Starship
+     when: ansible_local.starship.installed == false
+     command: wget -P ~/starship https://starship.rs/install.sh
+     become_user: vagrant
+     args:
+      warn: false
+
+   - name: Install Starship
+     when: ansible_local.starship.installed == false
+     command: bash ~/starship/install.sh --yes
      become_user: vagrant

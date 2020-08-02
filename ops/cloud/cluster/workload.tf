@@ -53,5 +53,5 @@ resource "kubernetes_service_account" "workload_service" {
 resource "google_service_account_iam_member" "workload_iam_member" {
   service_account_id = google_service_account.workload_service.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${local.project}.svc.id.goog[default/${kubernetes_service_account.workload_service.metadata[0].name}]"
+  member             = "serviceAccount:${local.project}.svc.id.goog[default/workload]"
 }

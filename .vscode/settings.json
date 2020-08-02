@@ -4,5 +4,8 @@
         "default": true,
         "MD041": { "level": 1 },
         "MD033": { "allowed_elements": ["p","img", "h2"] }
+    },
+    "files.associations": {
+        "vagrantfile": "ruby"
     }
 }

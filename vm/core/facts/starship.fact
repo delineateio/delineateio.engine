@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$(command -v packer)" ]
+if [ -z "$(command -v starship)" ]
 then
       echo "{\"installed\" : false}"
 else

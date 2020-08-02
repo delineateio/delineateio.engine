@@ -24,14 +24,14 @@ export RESET="$(tput sgr0)"
 # Defaults - enable compiled app
 export DELINEATEIO_ENV=dev
 export DELINEATEIO_LOCATION=../config
-export TF_VARS=/home/vagrant/project/.circleci/tf
-
-# Starts SSH sessions in the project folder and enables scripts
-cd ~/project || return
-clear
+export TF_VARS=${HOME}/project/.circleci/tf
 
 # shellcheck disable=SC2046
 chmod +x $(find . -type f -name "*.sh")
 
 # Ensures starship prompt used
 eval "$(starship init bash)"
+
+# Starts SSH sessions in the project folder and enables scripts
+cd ~/project || return
+clear

@@ -49,7 +49,7 @@ The following files need to be added in `./vm/config/.env` and export the follow
 * snyk.env
 * git.env
 
-> More information has been provided on these env variable requirements [here](./docs/env.md).
+> More information has been provided on these env variable requirements [here](./docs/dev.md).
 
 ### SSH Keys
 

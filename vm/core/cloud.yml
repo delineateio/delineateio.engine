@@ -1,5 +1,5 @@
 ---
-- name: GCloud Install
+- name: Cloud Install
   connection: local
   gather_facts: true
   hosts: all
@@ -36,3 +36,7 @@
      when: ansible_local.kubectl.installed == false
      command: gcloud components install kubectl --quiet
      become_user: vagrant
+
+   - name: Install Octant
+     apt:
+      deb: https://github.com/vmware-tanzu/octant/releases/download/v0.13.1/octant_0.13.1_Linux-64bit.deb

@@ -1,7 +1,7 @@
 ---
-- name: GCloud Config
+- name: Cloud Config
   connection: local
-  gather_facts: true
+  gather_facts: false
   hosts: all
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -31,27 +31,6 @@
        mode: '0755'
      become_user: vagrant
 
-   - name: Create Microk8s Directory
-     file:
-       path: /etc/microk8s
-       state: directory
-       owner: root
-       mode: '0755'
-
-   # NOTE: Extract first, then copied to vagrant users HOME
-   - name: Extract Microk8s Config
-     shell: |
-      microk8s kubectl config view --raw > /etc/microk8s/config
-
-   - name: Add Local Cluster
-     shell: |
-      cat /etc/microk8s/config > ~/.kube/config
-     become_user: vagrant
-
-   - name: Rename Local Cluster
-     command: kubectl config rename-context microk8s local
-     become_user: vagrant
-
    - name: Add Dev Cluster
      command: gcloud container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
      become_user: vagrant
@@ -67,3 +46,17 @@
        gcloud auth configure-docker -q
        docker-credential-gcr configure-docker
      become_user: vagrant
+
+   - name: Add Octant Service
+     copy:
+      remote_src: yes
+      src: /home/vagrant/project/vm/config/octant/octant.service
+      dest: /etc/systemd/system/octant.service
+      owner: root
+
+   - name: Start Octant Service
+     systemd:
+      name: octant.service
+      daemon_reload: yes
+      enabled: yes
+      state: started

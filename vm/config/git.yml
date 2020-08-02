@@ -9,12 +9,35 @@
   become_user: vagrant
   tasks:
 
-   - name: "Configure Git Global"
-     command: "git config --global {{ item }}"
-     with_items:
-      - user.name ${GIT_NAME}
-      - user.email ${GIT_EMAIL}
-      - alias.pretty log --pretty=oneline --abbrev-commit -n 10
+   - name: Add Git Ignores
+     copy:
+      remote_src: no
+      src: ~/project/vm/config/git/.gitignore_global
+      dest: ~/.gitignore_global
+
+   - name: "Add Commit Template"
+     copy:
+      remote_src: yes
+      src: ~/project/vm/config/git/.gitmessage.txt
+      dest: ~/.gitmessage.txt
+
+   - name: "Configure Git Name"
+     command: git config --global user.name ${GIT_NAME}
+
+   - name: "Configure Git Email"
+     command: git config --global user.email ${GIT_EMAIL}
+
+   - name: "Configure Git Editor"
+     command: git config --global core.editor nano
+
+   - name: "Configure Git Excludes"
+     command: git config --global core.excludesfile ~/.gitignore_global
+
+   - name: "Configure Git Messages"
+     command: git config --global commit.template ~/.gitmessage.txt
+
+   - name: "Add Git Alias (git pretty)"
+     command: git config --global alias.pretty "log --pretty=oneline --abbrev-commit -n 10"
 
    - name: Check for Secrets Baseline
      local_action: stat path=.secrets.baseline

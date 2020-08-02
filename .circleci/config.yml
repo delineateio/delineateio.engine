@@ -10,6 +10,9 @@ parameters:
   ruby-image:
     type: string
     default: "circleci/ruby:2.5.1"
+  python-image:
+    type: string
+    default: "circleci/python:3.8.0"
   inspec-version:
     type: string
     default: "4.21.3"
@@ -203,6 +206,22 @@ jobs:
                       --input gcp_project_id=$GOOGLE_PROJECT \
                               gcp_region=$GOOGLE_REGION \
                               gcp_zone=$GOOGLE_ZONE
+
+  customer_tests:
+    docker:
+      - image: << pipeline.parameters.python-image >>
+    steps:
+      - checkout
+      - set_branch
+      - run:
+          name: Install Dependencies
+          command: pip3 install -r requirements.txt
+      - run:
+          name: Run Behave Tests
+          command: |
+            source ~/.env
+            cd ./dev/services/customers/features
+            behave -f pretty *.feature
 
   destroy:
     docker:

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ -z "$(command -v trivy)" ]
-then
-      echo "{\"installed\" : false}"
-else
-      echo "{\"installed\" : true}"
-fi
