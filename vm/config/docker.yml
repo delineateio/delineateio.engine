@@ -8,15 +8,11 @@
   become: true
   tasks:
 
+   - name: Remove Containers
+     shell: docker rm $(docker ps -a -q) -f || true
+
    - name: Start Postgres 11.6 Container
-     docker_container:
-      name: database-debug
-      image: postgres:11.6
-      state: started
-      ports:
-        - 5432:5432
-      env:
-        POSTGRES_PASSWORD: "postgres"
+     shell: docker run --name database-debug -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres:11.6
 
    - name: Docker Prune Job
      cron:

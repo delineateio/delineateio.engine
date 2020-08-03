@@ -2,7 +2,7 @@
 set -e
 
 ###################################################################
-# Script Name	: connect.sh
+# Script Name	: reconnect.sh
 # Description	: Connect kubectl to the remote 'dev` clsuter',
 #               : useful particularly after the cloud environment
 #               : has been rebuilt.

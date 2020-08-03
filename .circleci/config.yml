@@ -83,7 +83,10 @@ commands:
           command: gcloud components install kubectl skaffold --quiet
       - run:
           name: Install Container Structure Test
-          command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+          command: |
+            curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+            chmod +x container-structure-test-linux-amd64
+            mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
       - run:
           name: Add GKE Config
           command: source ~/.env && gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE
@@ -96,6 +99,29 @@ commands:
       - run:
           name: Add New Deployment
           command: source ~/.env && bash ./.circleci/deploy_add.sh << parameters.component_type >> << parameters.component_name >>
+  test_component:
+    parameters:
+      component_type:
+        type: string
+      component_name:
+        type: string
+    steps:
+      - checkout
+      - set_branch
+      - get_services
+      - run:
+          name: Upgrade Pip
+          command: pip install --user --upgrade pip
+      - run:
+          name: Upgrade Pip
+          command: pip3 install --user -r requirements.txt
+      - run:
+          name: Run Behave Tests
+          command: |
+            source ~/.env
+            cd ./dev/<< parameters.component_type >>/<< parameters.component_name >>/features
+            behave -f pretty *.feature
+
   gcp_destroy:
     parameters:
       dir:
@@ -193,19 +219,9 @@ jobs:
     docker:
       - image: << pipeline.parameters.python-image >>
     steps:
-      - checkout
-      - set_branch
-      - get_services
-      - run:
-          name: Upgrade Pip
-          command: pip install --user --upgrade pip
-      - run:
-          name: Run Behave Tests
-          command: |
-            source ~/.env
-            cd ./dev/services/customers/features
-            pip3 install --user -r requirements.txt
-            behave -f pretty *.feature
+      - test_component:
+          component_type: "services"
+          component_name: "customers"
 
   destroy:
     docker:
@@ -250,12 +266,3 @@ workflows:
       - test_customers:
           requires:
             - apply_ingress
-#  down:
-#    triggers:
-#      - schedule:
-#          cron: "0 1,4,7,17 * * *"
-#          filters:
-#            branches:
-#              ignore: "master"
-#    jobs:
-#      - destroy

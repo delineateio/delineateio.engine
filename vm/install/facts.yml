@@ -18,7 +18,7 @@
    - name: "Add Facts"
      copy:
       remote_src: yes
-      src: ~/project/vm/core/facts/
+      src: ~/project/vm/install/facts/
       dest: /etc/ansible/facts.d
      become_user: vagrant
 

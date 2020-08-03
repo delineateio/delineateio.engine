@@ -36,15 +36,27 @@
       deb: https://github.com/aquasecurity/trivy/releases/download/v0.9.1/trivy_0.9.1_Linux-64bit.deb
 
    - name: Install CircleCI
-     snap:
-      name: circleci
-      channel: latest/stable
-      state: present
+     shell:
+      curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh | bash
+     args:
+      warn: false
 
    - name: Install PSQL
      apt:
       name: postgresql-client=10+190ubuntu0.1
       state: present
+
+   - name: Install JQ
+     apt:
+      name: jq=1.5+dfsg-2
+      state: present
+
+   # Hack - Ensure there is a usable
+   # https://stackoverflow.com/questions/49911550/how-to-upgrade-disutils-package-pyyaml
+   - name: Install PyYAML
+     pip:
+      name: PyYAML==5.3.1
+      extra_args: --ignore-installed
 
    - name: Install Pre-Commit
      when: ansible_local.pre_commit.installed == false

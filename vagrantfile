@@ -3,11 +3,8 @@ Vagrant.require_version "=2.2.9"
 ansible_version   = "2.9.11"
 ansible_verbose   = false
 ansible_home      = "/home/vagrant/project/vm"
-
-core_playbooks    = ["bootstrap","profile","facts","docker","cloud","go","cli"]
+install_playbooks    = ["bootstrap","profile","facts","docker","cloud","go","cli"]
 config_playbooks  = ["profile","docker","cloud","proxy","starship","git"]
-core_playbooks    = []
-config_playbooks  = ["python"]
 
 Vagrant.configure("2") do |config|
 
@@ -15,19 +12,23 @@ Vagrant.configure("2") do |config|
   config.vm.box_version = "202005.21.0"
 
   # Priority order of providers
-  config.vm.provider "vmware_fusion" do |v|
-    v.vmx["memsize"] = "4096"
-    v.vmx["numvcpus"] = "4"
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4096
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
   # Changes the default project sync dir
+  config.vm.network :private_network, ip: "10.11.12.13"
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder ".", "/home/vagrant/project"
-  config.vm.synced_folder "~/.gcloud/delineateio/platform", "/home/vagrant/.gcloud/delineateio/platform"
+  config.vm.synced_folder ".", "/home/vagrant/project", :nfs => true
+  config.vm.synced_folder "~/.gcloud/delineateio/platform", "/home/vagrant/.gcloud/delineateio/platform", :nfs => true
 
-  core_playbooks.each do |playbook|
+  install_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
-      ansible.provisioning_path = "#{ansible_home}/core"
+      ansible.provisioning_path = "#{ansible_home}/install"
       ansible.version           = ansible_version
       ansible.verbose           = ansible_verbose
       ansible.playbook          = "#{playbook}.yml"
