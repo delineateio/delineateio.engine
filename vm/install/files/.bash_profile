@@ -3,6 +3,12 @@
 source /etc/skel/.bashrc # Maintains colours :)
 source /etc/environment # Resets PATH
 
+# Activates the the venv if exists
+if test -f "$HOME/project/.venv/bin/activate"; then
+    # shellcheck source=/dev/null
+    source "$HOME/project/.venv/bin/activate"
+fi
+
 # Ensure that the $PATH is set correctly
 PATH=/snap/bin:$PATH # Ensures snap in the PATH
 PATH=$HOME/google-cloud-sdk/bin:$PATH # Adds gcloud to PATH

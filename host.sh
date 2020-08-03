@@ -21,10 +21,9 @@ function addhost() {
 
 function installCARoot() {
 
-    # Adds the certificate
-    BASEDIR=$(dirname "$0")
-    export CAROOT="${BASEDIR}/vm/certs"
-    # sudo mkcert -uninstall
+    sudo mkcert -uninstall
+    CAROOT="$(pwd)/vm/certs"
+    export CAROOT
     sudo mkcert -install
 }
 
@@ -33,3 +32,6 @@ addhost 127.0.0.1 delineate.local
 
 #Installs the CA
 installCARoot
+
+# Activates the virtual env
+source ./.venv/bin/activate

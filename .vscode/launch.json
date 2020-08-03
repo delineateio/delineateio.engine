@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug | API | Customers",
+            "name": "API | Customers",
             "type": "go",
             "request": "launch",
             "mode": "auto",
