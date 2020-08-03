@@ -64,12 +64,15 @@
      apt:
       name: python3-pip=9.0.1-2.3~ubuntu1.18.04.1
 
-   - name: "Pip Upgrade"
+   - name: "PIP Upgrade"
      command: python3.8 -m pip install --upgrade pip setuptools wheel
 
-   - name: Install Setuptools
+   - name: Create Virtual Env
      pip:
-      name: pip install setuptools==49.2.0
+      virtualenv: ~/project/.venv
+      virtualenv_python: python3.8
+      requirements: ~/project/requirements.txt
+     become_user: vagrant
 
   # Adds time to sync to Cloudflare time
   # https://www.cloudflare.com/time/

@@ -25,6 +25,12 @@
 
    - name: Create .kube Directory
      file:
+      path: ~/.kube
+      state: absent
+     become_user: vagrant
+
+   - name: Create .kube Directory
+     file:
        path: ~/.kube
        state: directory
        owner: vagrant
