@@ -83,7 +83,10 @@ commands:
           command: gcloud components install kubectl skaffold --quiet
       - run:
           name: Install Container Structure Test
-          command: curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+          command: |
+            curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+            chmod +x container-structure-test-linux-amd64
+            mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
       - run:
           name: Add GKE Config
           command: source ~/.env && gcloud container clusters get-credentials app-cluster -z $GOOGLE_ZONE

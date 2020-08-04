@@ -3,7 +3,7 @@ Vagrant.require_version "=2.2.9"
 ansible_version   = "2.9.11"
 ansible_verbose   = false
 ansible_home      = "/home/vagrant/project/vm"
-core_playbooks    = ["bootstrap","profile","facts","docker","cloud","go","cli"]
+install_playbooks    = ["bootstrap","profile","facts","docker","cloud","go","cli"]
 config_playbooks  = ["profile","docker","cloud","proxy","starship","git"]
 
 Vagrant.configure("2") do |config|
@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/home/vagrant/project", :nfs => true
   config.vm.synced_folder "~/.gcloud/delineateio/platform", "/home/vagrant/.gcloud/delineateio/platform", :nfs => true
 
-  core_playbooks.each do |playbook|
+  install_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
       ansible.provisioning_path = "#{ansible_home}/install"
       ansible.version           = ansible_version
