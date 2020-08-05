@@ -262,7 +262,6 @@ workflows:
       - test_infrastructure:
           requires:
             - apply_ingress
-
       - test_customers:
           requires:
             - apply_ingress

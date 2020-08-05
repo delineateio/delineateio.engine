@@ -8,5 +8,4 @@
     "files.associations": {
         "vagrantfile": "ruby"
     },
-    "python.pythonPath": "./.venv/bin/python3.8",
 }
