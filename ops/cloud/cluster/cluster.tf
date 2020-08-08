@@ -60,6 +60,10 @@ resource "google_container_cluster" "app_cluster" {
       start_time = "03:00"
     }
   }
+
+  lifecycle {
+    ignore_changes = ["master_auth"]
+  }
 }
 
 resource "google_container_node_pool" "app_cluster_nodes" {

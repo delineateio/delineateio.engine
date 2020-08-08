@@ -28,6 +28,10 @@ resource "google_project_iam_member" "workload_iam_monitoring_viewer" {
   role   = "roles/monitoring.viewer"
   member = "serviceAccount:${google_service_account.workload_service.email}"
 }
+resource "google_project_iam_member" "workload_identity_user" {
+  role   = "roles/iam.workloadIdentityUser"
+  member = "serviceAccount:${google_service_account.workload_service.email}"
+}
 
 # Binds the service account to workload account
 # https://www.terraform.io/docs/providers/google/r/google_service_account_iam.html

@@ -9,7 +9,7 @@ control "app-storage-1.0" do
 
   # Tests all buckets have the expected items
   describe google_storage_buckets(project: gcp_project_id) do
-    its('count') { should eq 3 }
+    its('count') { should eq 5 }
   end
 
   describe google_storage_bucket(name: gcp_project_id + '-tf') do

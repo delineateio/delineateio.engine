@@ -50,3 +50,19 @@ resource "google_project_service" "service_networking" {
   disable_dependent_services = local.disable_dependent_services
   disable_on_destroy         = local.disable_on_destroy
 }
+
+# Creates the service
+# https://www.terraform.io/docs/providers/google/r/google_project_service.html
+resource "google_project_service" "cloud" {
+  service                    = "run.googleapis.com"
+  disable_dependent_services = local.disable_dependent_services
+  disable_on_destroy         = local.disable_on_destroy
+}
+
+# Enables Cloud Scheduler
+# https://www.terraform.io/docs/providers/google/r/google_project_service.html
+resource "google_project_service" "cloud_scheduler" {
+  service                    = "cloudscheduler.googleapis.com"
+  disable_dependent_services = local.disable_dependent_services
+  disable_on_destroy         = local.disable_on_destroy
+}
