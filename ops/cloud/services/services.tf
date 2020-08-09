@@ -66,3 +66,11 @@ resource "google_project_service" "cloud_scheduler" {
   disable_dependent_services = local.disable_dependent_services
   disable_on_destroy         = local.disable_on_destroy
 }
+
+# Enables App Engine - This is REQUIRED by cloud scheduler
+# https://www.terraform.io/docs/providers/google/r/google_project_service.html
+resource "google_project_service" "app_engine" {
+  service                    = "appengine.googleapis.com"
+  disable_dependent_services = local.disable_dependent_services
+  disable_on_destroy         = local.disable_on_destroy
+}

@@ -54,7 +54,6 @@ resource "google_cloud_scheduler_job" "clean_job" {
   attempt_deadline = "360s"
 
   http_target {
-    headers     = {}
     http_method = "POST"
     uri         = "${google_cloud_run_service.clean_job.status[0].url}/http"
     body        = base64encode(templatefile("${path.module}/cleaner/config.json", { gcp_project = "${local.gcp_project}", gcp_registry = "${var.gcp_registry}" }))
@@ -65,7 +64,7 @@ resource "google_cloud_scheduler_job" "clean_job" {
     }
   }
 
-  timeouts {}
+  depends_on = [google_project_iam_member.infrastructure_app_engine_creator]
 }
 
 # Outputs the url of the service
