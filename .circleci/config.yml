@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.8.0
+
 parameters:
   terraform-image:
     type: string
@@ -49,9 +52,9 @@ commands:
             source ~/.env
             cd << parameters.dir >>
             terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-            terraform plan -var-file="${TF_VARS}/${DELINEATEIO_ENV}.tfvars" \
-                              -lock=true -refresh=true -out="${TF_VARS}/plan.out"
-            terraform apply -lock=true -refresh=true -auto-approve "${TF_VARS}/plan.out"
+            terraform plan -var-file="${DIO_VARS}/${DIO_ENV}.tfvars" \
+                              -lock=true -refresh=true -out="${DIO_VARS}/plan.out"
+            terraform apply -lock=true -refresh=true -auto-approve "${DIO_VARS}/plan.out"
   get_services:
     steps:
       - run:
@@ -122,20 +125,8 @@ commands:
             cd ./dev/<< parameters.component_type >>/<< parameters.component_name >>/features
             behave -f pretty *.feature
 
-  gcp_destroy:
-    parameters:
-      dir:
-        type: string
-    steps:
-      - run:
-          name: Destroy
-          command: |
-            source ~/.env
-            cd << parameters.dir >>
-            terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
-            terraform destroy -var-file="../env/${DELINEATEIO_ENV}.tfvars" -auto-approve
-
 jobs:
+
   enable_services:
     docker:
       - image: << pipeline.parameters.terraform-image >>
@@ -162,6 +153,15 @@ jobs:
     steps:
       - gcp_apply:
           dir: ./ops/cloud/db
+
+  schedule_jobs:
+    docker:
+      - image: << pipeline.parameters.terraform-image >>
+    environment:
+      BASH_ENV: "~/.bash_profile"
+    steps:
+      - gcp_apply:
+          dir: ./ops/cloud/jobs
 
   apply_cluster:
     docker:
@@ -223,23 +223,14 @@ jobs:
           component_type: "services"
           component_name: "customers"
 
-  destroy:
-    docker:
-      - image: << pipeline.parameters.terraform-image >>
-    steps:
-      - add_bash
-      - checkout
-      - set_branch
-      - gcp_destroy:
-          dir: ./ops/cloud/ingress
-      - gcp_destroy:
-          dir: ./ops/cloud/cluster
-
 workflows:
   version: 2
   up:
     jobs:
       - enable_services
+      - schedule_jobs:
+          requires:
+            - enable_services
       - apply_network:
           requires:
             - enable_services

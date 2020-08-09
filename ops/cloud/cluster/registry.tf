@@ -6,11 +6,9 @@ resource "google_service_account" "registry_service_account" {
   description  = "Service account for pulling images from GCR to GKE"
 }
 
-resource "google_project_iam_binding" "registry_iam_binding" {
-  role = "roles/storage.objectViewer"
-  members = [
-    "serviceAccount:${google_service_account.registry_service_account.email}"
-  ]
+resource "google_project_iam_member" "project" {
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.registry_service_account.email}"
 }
 
 # Gets a service account key

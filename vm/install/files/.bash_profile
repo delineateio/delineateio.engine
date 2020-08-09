@@ -28,9 +28,9 @@ export DETAIL="$(tput setaf 6)"
 export RESET="$(tput sgr0)"
 
 # Defaults - enable compiled app
-export DELINEATEIO_ENV=dev
-export DELINEATEIO_LOCATION=../config
-export TF_VARS=${HOME}/project/.circleci/tf
+export DIO_ENV=dev
+export DIO_LOCATION=../config
+export DIO_VARS=${HOME}/project/.circleci/tf
 
 # shellcheck disable=SC2046
 chmod +x $(find . -type f -name "*.sh")

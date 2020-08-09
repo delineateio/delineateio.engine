@@ -8,3 +8,10 @@ roles/iam.serviceAccountKeyAdmin
 roles/iam.serviceAccountUser
 roles/storage.admin
 roles/storage.objectViewer
+roles/storage.objectAdmin
+roles/secretmanager.admin
+roles/servicenetworking.networksAdmin
+roles/cloudsql.admin
+roles/resourcemanager.projectIamAdmin
+roles/run.admin
+roles/cloudscheduler.admin

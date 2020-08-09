@@ -8,6 +8,14 @@
             "mode": "auto",
             "program": "${workspaceFolder}/dev/services/customers/src",
             "envFile": "${workspaceFolder}/dev/services/customers/env/debug.env",
+        },
+        {
+            "name": "Jobs | Destroy",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/ops/cloud/jobs/destroy/src",
+            "envFile": "${workspaceFolder}/ops/cloud/jobs/destroy/env/debug.env",
         }
     ]
 }

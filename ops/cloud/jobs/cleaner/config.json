@@ -1,0 +1,6 @@
+{
+    "repo" : "${gcp_registry}/${gcp_project}",
+    "json" : "60s",
+    "allow_tagged": true,
+    "keep" : 5
+}

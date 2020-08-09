@@ -13,3 +13,6 @@ cluster_deployment_versions=3
 
 # DB
 db_machine_type="db-f1-micro"
+
+# Jobs
+job_region="europe-west4" # Netherlands
