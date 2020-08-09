@@ -7,12 +7,6 @@ resource "google_cloud_run_service_iam_policy" "destroy_policy" {
   policy_data = data.google_iam_policy.schedule_policy.policy_data
 }
 
-# Gets a reference to the infrastructure service account
-# https://www.terraform.io/docs/providers/google/d/service_account.html
-data "google_service_account" "infrastructure" {
-  account_id = "infrastructure"
-}
-
 # Creates the Cloud Run job for destroying the infrastructure
 # https://www.terraform.io/docs/providers/google/r/cloud_run_service.html
 resource "google_cloud_run_service" "destroy_job" {
@@ -50,6 +44,8 @@ resource "google_cloud_scheduler_job" "destroy_job" {
       service_account_email = google_service_account.schedules_service_account.email
     }
   }
+
+  depends_on = [google_project_iam_member.infrastructure_app_engine_creator]
 }
 
 # Outputs the url of the service

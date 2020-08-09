@@ -62,7 +62,7 @@ resource "google_container_cluster" "app_cluster" {
   }
 
   lifecycle {
-    ignore_changes = ["master_auth"]
+    ignore_changes = [master_auth]
   }
 }
 

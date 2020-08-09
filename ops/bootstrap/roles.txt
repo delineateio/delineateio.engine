@@ -15,3 +15,5 @@ roles/cloudsql.admin
 roles/resourcemanager.projectIamAdmin
 roles/run.admin
 roles/cloudscheduler.admin
+roles/appengine.appAdmin
+roles/iam.roleAdmin
