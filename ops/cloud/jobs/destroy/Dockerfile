@@ -31,7 +31,7 @@ RUN mkdir -p /hashicorp
 RUN cd /hashicorp
 RUN wget -q https://releases.hashicorp.com/terraform/0.12.29/terraform_0.12.29_linux_amd64.zip
 RUN unzip -qq terraform_0.12.29_linux_amd64.zip
-RUN install terraform /usr/local/bin/
+RUN install terraform /usr/local/bin/  && rm terraform_0.12.29_linux_amd64.zip
 
 EXPOSE 8080
 

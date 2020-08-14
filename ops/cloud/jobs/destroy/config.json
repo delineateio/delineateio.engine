@@ -1,3 +1,6 @@
 {
-	"components": ["ingress", "cluster"]
+	"env": "${env}",
+	"repo_url": "https://github.com/delineateio/platform.git",
+	"repo_root": "/platform",
+	"components": ["/ops/cloud/ingress", "/ops/cloud/cluster"]
 }

@@ -28,7 +28,7 @@ resource "kubernetes_secret" "registry_secret" {
   data = {
     ".dockerconfigjson" = jsonencode({
       "auths" : {
-        "https://${var.gcp_registry}/${data.google_client_config.context.project}" : {
+        "https://${var.registry}/${data.google_client_config.context.project}" : {
           email    = google_service_account.registry_service_account.email
           username = "_json_key"
           password = trimspace(base64decode(google_service_account_key.registry_key.private_key))
