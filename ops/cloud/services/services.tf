@@ -74,3 +74,19 @@ resource "google_project_service" "app_engine" {
   disable_dependent_services = local.disable_dependent_services
   disable_on_destroy         = local.disable_on_destroy
 }
+
+# Enables Cloud Reporting
+# https://www.terraform.io/docs/providers/google/r/google_project_service.html
+resource "google_project_service" "cloud_error_reporting" {
+  service                    = "clouderrorreporting.googleapis.com"
+  disable_dependent_services = local.disable_dependent_services
+  disable_on_destroy         = local.disable_on_destroy
+}
+
+# Enables Auditing
+# https://www.terraform.io/docs/providers/google/r/google_project_service.html
+resource "google_project_service" "audit" {
+  service                    = "audit.googleapis.com"
+  disable_dependent_services = local.disable_dependent_services
+  disable_on_destroy         = local.disable_on_destroy
+}

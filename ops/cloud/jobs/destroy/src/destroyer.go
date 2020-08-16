@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	gcrauthn "github.com/google/go-containerregistry/pkg/authn"
 )
 
 const terraform = "terraform"
 const lock = "-lock=true"
-const refresh = "-lock=true"
+const refresh = "-refresh=true"
 const auto = "-auto-approve"
-const plan = "/tmp/plan.out"
 
 // Destroyer is a gcr cleaner.
 type Destroyer struct {
@@ -26,32 +26,34 @@ func NewDestroyer(auther gcrauthn.Authenticator) (*Destroyer, error) {
 	}, nil
 }
 
-func newDestroyContext() destroyContext {
+func newDestroyContext(payload payload) destroyContext {
 
 	return destroyContext{
-		project: os.Getenv("GOOGLE_PROJECT"),
-		env:     os.Getenv("DIO_ENV"),
-		url:     os.Getenv("DIO_REPO_URL"),
-		root:    os.Getenv("DIO_REPO_ROOT"),
-		dir:     ".",
+		env:        payload.Env,
+		project:    os.Getenv("GOOGLE_PROJECT"),
+		url:        payload.RepoURL,
+		root:       payload.RepoRoot,
+		components: payload.Components,
 	}
 }
 
 // DestroyContext holds the value for the destroy
 type destroyContext struct {
-	project string
-	env     string
-	root    string
-	url     string
-	dir     string
+	env        string
+	project    string
+	url        string
+	root       string
+	components []string
+	current    string
 }
 
-func newCommandInfo(ctx destroyContext, app string, params []string) commandInfo {
+func newCommandInfo(ctx destroyContext, app string, params []string, output bool) commandInfo {
 
 	return commandInfo{
 		ctx:    ctx,
 		app:    app,
 		params: params,
+		output: output,
 	}
 }
 
@@ -59,18 +61,13 @@ type commandInfo struct {
 	ctx    destroyContext
 	app    string
 	params []string
-}
-
-func (c *commandInfo) print() {
-
-	fmt.Println(c.app)
-	fmt.Println(c.params)
+	output bool
 }
 
 // Destroy remove the infrastructure
-func (d *Destroyer) Destroy(components []string) error {
+func (d *Destroyer) Destroy(payload payload) error {
 
-	ctx := newDestroyContext()
+	ctx := newDestroyContext(payload)
 
 	// Clones the existing repo
 	err := clone(ctx)
@@ -78,8 +75,8 @@ func (d *Destroyer) Destroy(components []string) error {
 		return err
 	}
 
-	for i := 0; i < len(components); i++ {
-		ctx.dir = getDir(ctx, components[i])
+	for i := 0; i < len(ctx.components); i++ {
+		ctx.current = ctx.root + ctx.components[i]
 		err := destroy(ctx)
 		if err != nil {
 			return err
@@ -104,16 +101,6 @@ func clone(ctx destroyContext) error {
 	return nil
 }
 
-func removeRepo(ctx destroyContext) commandInfo {
-
-	return newCommandInfo(ctx, "rm", []string{"-rf", ctx.root})
-}
-
-func cloneRepo(ctx destroyContext) commandInfo {
-
-	return newCommandInfo(ctx, "git", []string{"clone", ctx.url, ctx.root})
-}
-
 func destroy(ctx destroyContext) error {
 
 	err := execute(getInit(ctx))
@@ -121,12 +108,7 @@ func destroy(ctx destroyContext) error {
 		return err
 	}
 
-	err = execute(getPlan(ctx))
-	if err != nil {
-		return err
-	}
-
-	err = execute(getApply(ctx))
+	err = execute(getDestroy(ctx))
 	if err != nil {
 		return err
 	}
@@ -134,20 +116,34 @@ func destroy(ctx destroyContext) error {
 	return nil
 }
 
-// func print(info commandInfo) error {
+func removeRepo(ctx destroyContext) commandInfo {
 
-//	info.print()
-//	return nil
-// }
+	return newCommandInfo(ctx, "rm", []string{"-rf", ctx.root}, false)
+}
+
+func cloneRepo(ctx destroyContext) commandInfo {
+
+	return newCommandInfo(ctx, "git", []string{"clone", ctx.url, ctx.root}, false)
+}
+
+func print(info commandInfo) error {
+
+	fmt.Println(info.app, strings.Join(info.params, " "))
+	return nil
+}
 
 func execute(info commandInfo) error {
 
-	info.print()
+	print(info)
 
 	cmd := exec.Command(info.app, info.params...)
-	cmd.Dir = info.ctx.dir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Dir = info.ctx.current
+
+	if info.output {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
 	err := cmd.Run()
 
 	if err != nil {
@@ -162,24 +158,13 @@ func getInit(ctx destroyContext) commandInfo {
 
 	bucket := fmt.Sprintf("-backend-config=bucket=%s-tf", ctx.project)
 
-	return newCommandInfo(ctx, terraform, []string{"init", bucket})
+	return newCommandInfo(ctx, terraform, []string{"init", bucket}, false)
 }
 
-func getDir(ctx destroyContext, component string) string {
-
-	return ctx.root + "/ops/cloud/" + component
-}
-
-func getPlan(ctx destroyContext) commandInfo {
+func getDestroy(ctx destroyContext) commandInfo {
 
 	file := fmt.Sprintf("%s/.circleci/tf/%s.tfvars", ctx.root, ctx.env)
 	vars := "-var-file=" + file
-	out := fmt.Sprintf("-out=%s", plan)
 
-	return newCommandInfo(ctx, terraform, []string{"plan", vars, lock, refresh, out})
-}
-
-func getApply(ctx destroyContext) commandInfo {
-
-	return newCommandInfo(ctx, terraform, []string{"apply", lock, refresh, auto, plan})
+	return newCommandInfo(ctx, terraform, []string{"destroy", vars, lock, refresh, auto}, true)
 }

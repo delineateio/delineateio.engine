@@ -39,6 +39,9 @@
    - name: "Add Git Alias (git pretty)"
      command: git config --global alias.pretty "log --pretty=oneline --abbrev-commit -n 10"
 
+   - name: "Add Git Alias (git squash)"
+     command: git config --global alias.squash "push origin +$(git rev-parse --abbrev-ref HEAD)"
+
    - name: Check for Secrets Baseline
      local_action: stat path=.secrets.baseline
      register: secrets_baseline

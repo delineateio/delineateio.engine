@@ -1,5 +1,5 @@
 {
-    "repo" : "${gcp_registry}/${gcp_project}/customers",
+    "repo" : "${registry}/${project}/destroy",
     "json" : "60s",
     "allow_tagged": true,
     "keep" : 5

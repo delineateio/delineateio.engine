@@ -1,7 +1,3 @@
-locals {
-  region = data.google_client_config.context.region
-}
-
 # Gets a reference to the infrastructure service account
 # https://www.terraform.io/docs/providers/google/d/service_account.html
 data "google_service_account" "infrastructure" {

@@ -2,8 +2,8 @@
 set -e
 
 ###################################################################
-# Script Name	: deploy_check.sh
-# Description	: Cancels the CircleCI job if there is no change
+# Script Name	: deploy_add.sh
+# Description	: Add a deployment entry into the bucket
 # Args          : $1 = Type of the component to deploy
 #               : $2 = Name of the component to deploy
 # Author       	: Jonathan Fenwick
@@ -12,7 +12,9 @@ set -e
 
 TYPE="${1}"
 NAME="${2}"
-LOCATION="./.metadata/${TYPE}/${NAME}"
+
+# shellcheck source=/dev/null
+source ~/.env
 
 # Retrieve current
-gsutil cp "${LOCATION}.current" "gs://${GOOGLE_PROJECT}-deployments/${TYPE}/${NAME}.deployed"
+gsutil cp "/tmp/${NAME}.current" "gs://${GOOGLE_PROJECT}-deployments/${TYPE}/${NAME}.deployed"

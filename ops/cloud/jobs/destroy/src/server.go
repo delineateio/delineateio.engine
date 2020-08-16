@@ -31,33 +31,34 @@ func NewServer(destroyer *Destroyer) (*Server, error) {
 	}, nil
 }
 
-// PubSubHandler is an http handler that invokes the cleaner from a pubsub
+// PubSubHandler is an http handler that invokes the destroyer from a pubsub
 // request. Unlike an HTTP request, the pubsub endpoint always returns a success
 // unless the pubsub message is malformed.
 func (s *Server) PubSubHandler() http.HandlerFunc {
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		var m pubsubMessage
-		if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		var msg pubsubMessage
+		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
 			err = fmt.Errorf("failed to decode pubsub message: %w", err)
-			s.handleError(w, err, 400)
+			s.handleError(w, err, http.StatusBadRequest)
 			return
 		}
 
-		if len(m.Message.Data) == 0 {
+		if len(msg.Message.Data) == 0 {
 			err := fmt.Errorf("missing data in pubsub payload")
-			s.handleError(w, err, 400)
+			s.handleError(w, err, http.StatusBadRequest)
 			return
 		}
 
 		// Start a goroutine to delete the infrastructue
-		body := ioutil.NopCloser(bytes.NewReader(m.Message.Data))
+		body := ioutil.NopCloser(bytes.NewReader(msg.Message.Data))
 		go func() {
 			if _, err := s.destroy(body); err != nil {
 				log.Printf("error async: %s", err.Error())
 			}
 		}()
 
-		w.WriteHeader(204)
+		w.WriteHeader(http.StatusAccepted)
 	}
 }
 
@@ -72,7 +73,7 @@ func (s *Server) HTTPHandler() http.HandlerFunc {
 			return
 		}
 
-		w.WriteHeader(200)
+		w.WriteHeader(status)
 		w.Header().Set(contentTypeHeader, contentTypeJSON)
 	}
 }
@@ -80,20 +81,21 @@ func (s *Server) HTTPHandler() http.HandlerFunc {
 // destroy reads the given body as JSON and starts a destroy instance.
 func (s *Server) destroy(r io.ReadCloser) (int, error) {
 
-	var p Payload
-	if err := json.NewDecoder(r).Decode(&p); err != nil {
-		return 500, err
+	var payload payload
+
+	if err := json.NewDecoder(r).Decode(&payload); err != nil {
+		fmt.Println(err)
+		return http.StatusBadRequest, err
 	}
 
-	components := p.Components
-
-	err := s.destroyer.Destroy(components)
-
+	fmt.Println(payload)
+	err := s.destroyer.Destroy(payload)
 	if err != nil {
-		return 400, err
+		fmt.Println(err)
+		return http.StatusInternalServerError, err
 	}
 
-	return 200, nil
+	return http.StatusOK, nil
 }
 
 // handleError returns a JSON-formatted error message
@@ -104,7 +106,7 @@ func (s *Server) handleError(w http.ResponseWriter, err error, status int) {
 	b, err := json.Marshal(&errorResp{Error: err.Error()})
 	if err != nil {
 		err = fmt.Errorf("failed to marshal JSON errors: %w", err)
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -113,9 +115,10 @@ func (s *Server) handleError(w http.ResponseWriter, err error, status int) {
 	fmt.Fprint(w, string(b))
 }
 
-// Payload is the expected incoming payload format.
-type Payload struct {
-	// Repo is the name of the repo in the format gcr.io/foo/bar
+type payload struct {
+	Env        string   `json:"env"`
+	RepoURL    string   `json:"repo_url"`
+	RepoRoot   string   `json:"repo_root"`
 	Components []string `json:"components"`
 }
 

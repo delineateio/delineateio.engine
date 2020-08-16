@@ -1,5 +1,6 @@
+env="dev"
 domain="delineate.dev"
-gcp_registry="eu.gcr.io"
+registry="eu.gcr.io"
 app_cidr_range="10.2.0.0/16"
 
 # Cluster
@@ -16,3 +17,6 @@ db_machine_type="db-f1-micro"
 
 # Jobs
 job_region="europe-west4" # Netherlands
+schedule_time_zone="Europe/London"
+destroy_schedule="0 2,7,17 * * *"
+clean_schedule="0 */3 * * *"
