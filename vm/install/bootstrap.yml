@@ -33,14 +33,14 @@
        - gnupg-agent=2.2.4-1ubuntu1.2
        - gnupg2=2.2.4-1ubuntu1.2
        - pass=1.7.1-3
-       - software-properties-common=0.96.24.32.13
+       - software-properties-common #=0.96.24.32.13
        - unzip=6.0-21ubuntu1
        - tree=1.7.0-5
        - iptables-persistent=1.0.4+nmu2ubuntu1
        - nmap=7.60-1ubuntu5
        - rpm=4.14.1+dfsg1-2
-       - apache2-utils=2.4.29-1ubuntu4.13
-       - libnss3-tools=2:3.35-2ubuntu2.9
+       - apache2-utils #=2.4.29-1ubuntu4.13
+       - libnss3-tools #=2:3.35-2ubuntu2.9
        - ruby=1:2.5.1
        - ruby-dev=1:2.5.1
        - gcc=4:7.4.0-1ubuntu2.3
@@ -48,6 +48,7 @@
        - make=4.1-9.1ubuntu1
        - nginx=1.14.0-0ubuntu1.7
        - nodejs=10.22.0-1nodesource1
+       - jq=1.5+dfsg-2
       state: present
 
    - name: Install MkCert
@@ -56,9 +57,9 @@
       dest: /usr/local/bin/mkcert
       mode: '0775'
 
-   - name: Install PIP
-     apt:
-      name: python3-pip=9.0.1-2.3~ubuntu1.18.04.1
+  # - name: Install PIP
+  #   apt:
+  #    name: python3-pip=9.0.1-2.3~ubuntu1.18.04.1
 
   # Adds time to sync to Cloudflare time
   # https://www.cloudflare.com/time/

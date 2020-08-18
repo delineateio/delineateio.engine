@@ -1,6 +1,6 @@
 Vagrant.require_version "=2.2.9"
 
-ansible_version   = "2.9.11"
+ansible_version   = "2.9.12"
 ansible_verbose   = false
 ansible_home      = "/home/vagrant/project/vm"
 install_playbooks    = ["bootstrap","profile","facts","docker","cloud","go","cli"]
@@ -49,8 +49,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
 
   # Ports into the VM (HTTP, HTTPS, Posgres)
-  # config.vm.network "forwarded_port", guest: 80, host: 80, protocol: "tcp"
-  # config.vm.network "forwarded_port", guest: 443, host: 443, protocol: "tcp"
-  # config.vm.network "forwarded_port", guest: 5432, host: 5432, protocol: "tcp"
+  config.vm.network "forwarded_port", guest: 80, host: 80, protocol: "tcp"
+  config.vm.network "forwarded_port", guest: 443, host: 443, protocol: "tcp"
+  config.vm.network "forwarded_port", guest: 5432, host: 5432, protocol: "tcp"
 
 end

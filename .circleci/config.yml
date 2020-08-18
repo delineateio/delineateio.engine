@@ -91,6 +91,9 @@ commands:
           name: Check Deployment Version
           command: bash ./.circleci/scripts/check.sh << parameters.component_type >> << parameters.component_name >>
       - run:
+          name: Install Components
+          command: gcloud components install skaffold kubectl -q
+      - run:
           name: Run Deployment
           command: bash ./.circleci/scripts/deploy.sh << parameters.component_type >> << parameters.component_name >>
       - run:
