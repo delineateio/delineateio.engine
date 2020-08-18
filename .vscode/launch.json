@@ -7,7 +7,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/dev/services/customers/src",
-            "envFile": "${workspaceFolder}/dev/services/customers/env/debug.env",
+            "envFile": "${workspaceFolder}/dev/services/customers/debug.env",
         },
         {
             "name": "Jobs | Destroy",

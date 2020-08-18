@@ -12,13 +12,6 @@ set -e
 # Email         : jonathan.fenwick@delineate.io
 ###################################################################
 
-
-# bootstrap.sh
-#   dev
-#   io-delineate-platform-dev
-#   europe-west2
-#   delineate.dev
-
 echo
 [[ -z "$1" ]] && { echo "${WARN}Environment not provided${RESET}" ; exit 1; }
 [[ -z "$2" ]] && { echo "${WARN}GCP Project not provided${RESET}" ; exit 1; }
