@@ -26,4 +26,4 @@ gcloud container clusters get-credentials app-cluster -z "$GOOGLE_ZONE"
 
 # Applies the deployment using Skaffold
 cd "./dev/${COMPONENT_TYPE}/${COMPONENT_NAME}"
-skaffold run -p --skip-tests=true "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
+skaffold run --skip-tests=true -p "pub" -d "$GOOGLE_REGISTRY/$GOOGLE_PROJECT"
