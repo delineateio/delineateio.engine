@@ -1,7 +1,7 @@
 # Creates a network specifically for apps
 # https://www.terraform.io/docs/providers/google/r/compute_network.html
 resource "google_compute_network" "app_network" {
-  name                            = "app-network"
+  name                            = var.network_name
   description                     = "Network for managing application"
   routing_mode                    = "REGIONAL"
   auto_create_subnetworks         = false

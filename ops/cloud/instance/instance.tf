@@ -1,19 +1,14 @@
-# Formats the domain name
-locals {
-  domain = replace(var.domain, ".", "-")
-}
-
 # Creates the ramdom default password
 # https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password
 resource "random_password" "default_password" {
-  length  = 16
-  special = true
+  length  = 20
+  special = false
 }
 
 # Creates secret to store and enable access if required
 # https://www.terraform.io/docs/providers/google/r/secret_manager_secret.html
 resource "google_secret_manager_secret" "db_password_secret" {
-  secret_id = "${local.domain}-db-password"
+  secret_id = var.db_postgres_pw_secret
   replication {
     automatic = true
   }
@@ -29,7 +24,7 @@ resource "google_secret_manager_secret_version" "db_password_secret_version" {
 # Gets a reference to the network
 # https://www.terraform.io/docs/providers/google/d/compute_network.html
 data "google_compute_network" "app_network" {
-  name = "app-network"
+  name = var.network_name
 }
 
 # Creates a private IP address for VPC networking
@@ -85,7 +80,7 @@ resource "google_sql_user" "default_user" {
 # Creates secret to store and enable access if required
 # https://www.terraform.io/docs/providers/google/r/secret_manager_secret.html
 resource "google_secret_manager_secret" "db_instance_secret" {
-  secret_id = "${local.domain}-db-instance"
+  secret_id = var.db_instance_connection_secret
   replication {
     automatic = true
   }
@@ -101,7 +96,7 @@ resource "google_secret_manager_secret_version" "db_instance_secret_version" {
 # Creates secret to store and enable access if required
 # https://www.terraform.io/docs/providers/google/r/secret_manager_secret.html
 resource "google_secret_manager_secret" "db_name_secret" {
-  secret_id = "${local.domain}-db-name"
+  secret_id = var.db_instance_name_secret
   replication {
     automatic = true
   }

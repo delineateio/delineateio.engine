@@ -10,7 +10,15 @@ variable "registry" {
   type = string
 }
 
+variable "network_name" {
+  type = string
+}
+
 variable "app_cidr_range" {
+  type = string
+}
+
+variable "cluster_name" {
   type = string
 }
 
@@ -40,6 +48,18 @@ variable "cluster_max_unavailable" {
 
 variable "cluster_deployment_versions" {
   type = number
+}
+
+variable "db_instance_name_secret" {
+  type = string
+}
+
+variable "db_instance_connection_secret" {
+  type = string
+}
+
+variable "db_postgres_pw_secret" {
+  type = string
 }
 
 variable "db_machine_type" {

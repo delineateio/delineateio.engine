@@ -9,14 +9,9 @@ set -e
 ###################################################################
 
 ROOT=$(git rev-parse --show-toplevel)
-VARIABLES="${ROOT}/.circleci/tf/variables.tf"
+VARIABLES="${ROOT}/.circleci/terraform/variables.tf"
 
 cd "${ROOT}/ops/cloud"
 for DIR in */ ; do
     cp "${VARIABLES}" "${ROOT}/ops/cloud/${DIR}variables.tf"
-done
-
-cd "${ROOT}/dev/services"
-for DIR in */ ; do
-    cp "${VARIABLES}" "${ROOT}/dev/services/${DIR}tf/variables.tf"
 done
