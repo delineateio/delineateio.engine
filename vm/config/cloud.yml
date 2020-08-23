@@ -59,6 +59,7 @@
       src: /home/vagrant/project/vm/config/octant/octant.service
       dest: /etc/systemd/system/octant.service
       owner: root
+      mode: 777
 
    - name: Start Octant Service
      systemd:

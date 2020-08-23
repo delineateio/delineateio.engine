@@ -2,10 +2,11 @@
 set -e
 
 ###################################################################
-# Script Name	: reconnect.sh
-# Description	: Connect kubectl to the remote 'dev` clsuter',
-#               : useful particularly after the cloud environment
-#               : has been rebuilt.
+# Script Name	: destroy.sh
+# Description	: Destroys the infrastructure for `dev` and `pub`
+# Args          : $1 = Env to use
+#               : $2 = Component to destroy
+#               : $3 = Any additional terraform params
 # Author       	: Jonathan Fenwick
 # Email         : jonathan.fenwick@delineate.io
 ###################################################################
@@ -16,10 +17,11 @@ function destroy() {
     ENV="${1}"
     COMPONENT="${2}"
     ARGS="${3}"
+    ARGS_SIZE="${#ARGS}"
     ROOT=$(git rev-parse --show-toplevel)
 
     # shellcheck source=/dev/null
-    source "${ROOT}/.circleci/env/${ENV}.env"
+    source "${ROOT}/env/${ENV}.env"
 
     # shellcheck disable=SC2034
     GOOGLE_CREDENTIALS=$(cat "${HOME}/.gcloud/delineateio/platform/${ENV}/key.json")
@@ -32,6 +34,10 @@ function destroy() {
     echo "Env:       ${DETAIL}${ENV}${RESET}"
     echo "Component: ${DETAIL}${COMPONENT}${RESET}"
     echo "Project:   ${DETAIL}${GOOGLE_PROJECT}${RESET}"
+
+    if [ "$ARGS_SIZE" -gt 0 ]; then
+        echo
+    fi
 
     terraform init -backend-config="bucket=${GOOGLE_PROJECT}-tf"
 

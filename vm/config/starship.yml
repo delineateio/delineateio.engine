@@ -20,4 +20,5 @@
       remote_src: yes
       src: ~/project/vm/config/starship/starship.toml
       dest: ~/.config/starship.toml
+      mode: 777
      become_user: vagrant

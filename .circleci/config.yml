@@ -22,7 +22,7 @@ commands:
     steps:
       - run:
           name: Configure for Branch
-          command: bash ./.circleci/scripts/branch.sh
+          command: bash ./scripts/branch.sh
   gcp_key:
     steps:
       - run:
@@ -37,7 +37,7 @@ commands:
     steps:
       - run:
           name: Push To GCR
-          command: bash ./.circleci/scripts/push.sh << parameters.context >> << parameters.image >>
+          command: bash ./scripts/push.sh << parameters.context >> << parameters.image >>
 
   add_bash:
     steps:
@@ -59,10 +59,10 @@ commands:
       - get_services
       - run:
           name: Update Variables
-          command: bash ./.circleci/scripts/variables.sh
+          command: bash ./scripts/variables.sh
       - run:
           name: Apply Infrastructure
-          command: bash ./.circleci/scripts/apply.sh << parameters.dir >> << parameters.args >>
+          command: bash ./scripts/apply.sh << parameters.dir >> << parameters.args >>
   gcp_configure:
     steps:
       - run:
@@ -92,16 +92,16 @@ commands:
       - setup_remote_docker
       - run:
           name: Check Deployment Version
-          command: bash ./.circleci/scripts/check.sh << parameters.component_type >> << parameters.component_name >>
+          command: bash ./scripts/check.sh << parameters.component_type >> << parameters.component_name >>
       - run:
           name: Install Components
           command: gcloud components install skaffold kubectl -q
       - run:
           name: Run Deployment
-          command: bash ./.circleci/scripts/deploy.sh << parameters.component_type >> << parameters.component_name >>
+          command: bash ./scripts/deploy.sh << parameters.component_type >> << parameters.component_name >>
       - run:
           name: Add Deployment Version
-          command: bash ./.circleci/scripts/add.sh << parameters.component_type >> << parameters.component_name >>
+          command: bash ./scripts/add.sh << parameters.component_type >> << parameters.component_name >>
 
   test_component:
     parameters:

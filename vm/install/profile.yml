@@ -16,4 +16,5 @@
       remote_src: yes
       src: ~/project/vm/install/files/.bash_profile
       dest: ~/.bash_profile
+      mode: 777
      become_user: vagrant

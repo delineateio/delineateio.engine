@@ -3,7 +3,7 @@ Vagrant.require_version "=2.2.9"
 ansible_version   = "2.9.12"
 ansible_verbose   = false
 ansible_home      = "/home/vagrant/project/vm"
-install_playbooks    = ["bootstrap","profile","facts","docker","cloud","go","cli"]
+install_playbooks = ["bootstrap","profile","facts","docker","cloud","go","cli"]
 config_playbooks  = ["profile","docker","cloud","proxy","starship","git"]
 
 Vagrant.configure("2") do |config|

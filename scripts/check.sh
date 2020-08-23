@@ -2,7 +2,7 @@
 set -e
 
 ###################################################################
-# Script Name	: deploy_check.sh
+# Script Name	: check.sh
 # Description	: Cancels the CircleCI job if there is no change
 # Args          : $1 = Type of the component to deploy
 #               : $2 = Name of the component to deploy
