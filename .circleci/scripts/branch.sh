@@ -19,7 +19,7 @@ cp "${ROOT}/.circleci/env/dev.env" ~/.env
 # of the dev env for cost purposes
 if [ "$BRANCH" == "master" ]
 then
-    cp "${ROOT}/.circleci/env/pub.env" ~/.env
+    cp "${ROOT}/.circleci/env/dev.env" ~/.env
 fi
 
 # shellcheck source=/dev/null

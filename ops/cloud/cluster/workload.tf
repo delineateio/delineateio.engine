@@ -38,7 +38,7 @@ resource "google_project_iam_member" "workload_identity_user" {
 resource "google_service_account_iam_member" "workload_iam_member" {
   service_account_id = google_service_account.workload_service.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${local.project}.svc.id.goog[default/workload]"
+  member             = "serviceAccount:${local.project}.svc.id.goog[default/${google_service_account.workload_service.account_id}]"
 }
 
 # Creates the k8s service account

@@ -16,7 +16,7 @@ locals {
 # Gets access to the already created cluster
 # https://www.terraform.io/docs/providers/google/d/container_cluster.html
 data "google_container_cluster" "app_cluster" {
-  name     = "app-cluster"
+  name     = var.cluster_name
   location = data.google_client_config.context.zone
 }
 
@@ -85,7 +85,7 @@ resource "kubernetes_ingress" "app_ingress" {
 # Creates a static IP for the cluster addressing
 # https://www.terraform.io/docs/providers/google/r/compute_global_address.html
 resource "google_compute_global_address" "app_cluster_ip" {
-  name = "app-cluster-ip"
+  name = "${var.cluster_name}-ip"
 }
 
 # Creates a DNS entry

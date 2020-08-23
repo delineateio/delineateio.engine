@@ -6,7 +6,7 @@ parameters:
     default: "hashicorp/terraform:0.12.29"
   gcloud-image:
     type: string
-    default: "google/cloud-sdk:302.0.0-alpine"
+    default: "google/cloud-sdk:306.0.0-alpine"
   ruby-image:
     type: string
     default: "circleci/ruby:2.5.1"
@@ -48,6 +48,9 @@ commands:
     parameters:
       dir:
         type: string
+      args:
+        type: string
+        default: ""
     steps:
       - add_bash
       - checkout
@@ -59,7 +62,7 @@ commands:
           command: bash ./.circleci/scripts/variables.sh
       - run:
           name: Apply Infrastructure
-          command: bash ./.circleci/scripts/apply.sh << parameters.dir >>
+          command: bash ./.circleci/scripts/apply.sh << parameters.dir >> << parameters.args >>
   gcp_configure:
     steps:
       - run:
@@ -162,7 +165,7 @@ jobs:
       BASH_ENV: "~/.bash_profile"
     steps:
       - gcp_apply:
-          dir: ./ops/cloud/db
+          dir: ./ops/cloud/instance
 
   schedule_jobs:
     docker:
@@ -187,7 +190,8 @@ jobs:
       - image: << pipeline.parameters.terraform-image >>
     steps:
       - gcp_apply:
-          dir: ./dev/services/customers/tf
+          dir: ./ops/cloud/database
+          args: "'-var service_name=customers'"
 
   deploy_customers:
     docker:

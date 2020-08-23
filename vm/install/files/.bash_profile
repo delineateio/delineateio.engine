@@ -30,7 +30,7 @@ export RESET="$(tput sgr0)"
 # Defaults - enable compiled app
 export DIO_ENV=dev
 export DIO_LOCATION=../config
-export DIO_VARS=${HOME}/project/.circleci/tf
+export DIO_VARS=${HOME}/project/.circleci/terraform
 
 # shellcheck disable=SC2046
 chmod +x $(find . -type f -name "*.sh")

@@ -163,7 +163,7 @@ func getInit(ctx destroyContext) commandInfo {
 
 func getDestroy(ctx destroyContext) commandInfo {
 
-	file := fmt.Sprintf("%s/.circleci/tf/%s.tfvars", ctx.root, ctx.env)
+	file := fmt.Sprintf("%s/.circleci/terraform/%s.tfvars", ctx.root, ctx.env)
 	vars := "-var-file=" + file
 
 	return newCommandInfo(ctx, terraform, []string{"destroy", vars, lock, refresh, auto}, true)
