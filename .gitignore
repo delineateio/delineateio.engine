@@ -1,7 +1,6 @@
 # dirs
 .tmp/
 .env/
-.venv/
 .gcloud/
 .metadata/
 .terraform/

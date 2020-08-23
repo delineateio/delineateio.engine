@@ -37,10 +37,10 @@
      command: git config --global commit.template ~/.gitmessage.txt
 
    - name: "Add Git Alias (git pretty)"
-     command: git config --global alias.pretty "log --pretty=oneline --abbrev-commit -n 10"
+     command: git config --global alias.pretty "!git log --pretty=oneline --abbrev-commit -n 10"
 
    - name: "Add Git Alias (git force)"
-     command: git config --global alias.force "push origin +$(git rev-parse --abbrev-ref HEAD)"
+     command: git config --global alias.force "!git push origin +$(git rev-parse --abbrev-ref HEAD)"
 
    - name: "Install Git Hooks"
      command: pre-commit install

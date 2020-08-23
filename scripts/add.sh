@@ -2,7 +2,7 @@
 set -e
 
 ###################################################################
-# Script Name	: deploy_add.sh
+# Script Name	: add.sh
 # Description	: Add a deployment entry into the bucket
 # Args          : $1 = Type of the component to deploy
 #               : $2 = Name of the component to deploy

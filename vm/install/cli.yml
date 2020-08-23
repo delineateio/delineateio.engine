@@ -48,10 +48,10 @@
 
    # Hack - Ensure there is a usable
    # https://stackoverflow.com/questions/49911550/how-to-upgrade-disutils-package-pyyaml
-   - name: Install PyYAML
-     pip:
-      name: PyYAML==5.3.1
-      extra_args: --ignore-installed
+   # - name: Install PyYAML
+   #  pip:
+   #   name: PyYAML==5.3.1
+   #   extra_args: --ignore-installed
 
    - name: Install Pre-Commit
      when: ansible_local.pre_commit.installed == false

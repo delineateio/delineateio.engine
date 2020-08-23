@@ -17,6 +17,7 @@
      apt_repository:
       repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
       state: present
+      mode: 777
 
    - name: Install Docker
      apt:
