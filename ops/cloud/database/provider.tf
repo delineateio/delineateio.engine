@@ -1,5 +1,6 @@
 # This is an entrypoint
 terraform {
+  required_version = "=0.13.4"
   required_providers {
     random     = "2.3.0"
     google     = "3.32.0"

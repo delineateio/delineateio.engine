@@ -5,11 +5,13 @@
 .metadata/
 .terraform/
 .vagrant/
-.secure/
+secrets/
 certs/
 
-# Terraform
-# Local .terraform directories
+# vscode
+.vscode/settings.json
+
+# terraform
 **/.terraform/*
 *.tfstate
 *.tfstate.*
@@ -21,8 +23,12 @@ override.tf.json
 .terraformrc
 terraform.rc
 plan.out
+.terraform.lock.hcl
 
-# InSpec
+# other files
 inspec.lock
 *.pem
 *.todo
+
+# sensitive env
+box/.env

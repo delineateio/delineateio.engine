@@ -3,19 +3,19 @@ version: 2.1
 parameters:
   terraform-image:
     type: string
-    default: "hashicorp/terraform:0.12.29"
+    default: "hashicorp/terraform:0.13.4"
   gcloud-image:
     type: string
-    default: "google/cloud-sdk:306.0.0-alpine"
+    default: "google/cloud-sdk:321.0.0-alpine"
   ruby-image:
     type: string
-    default: "circleci/ruby:2.5.1"
+    default: "circleci/ruby:2.6.6"
   python-image:
     type: string
     default: "circleci/python:3.8.0"
   inspec-version:
     type: string
-    default: "4.21.3"
+    default: "4.24.8"
 
 commands:
   set_branch:

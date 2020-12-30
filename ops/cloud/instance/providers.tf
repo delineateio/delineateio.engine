@@ -1,9 +1,19 @@
 # This is an entrypoint
 terraform {
+  required_version = "=0.13.4"
   required_providers {
-    random      = "2.3.0"
-    google      = "3.32.0"
-    google-beta = "3.32.0"
+    google = {
+      source  = "hashicorp/google"
+      version = "3.32.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google"
+      version = "3.32.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "2.3.0"
+    }
   }
   backend "gcs" {
     prefix = "terraform/db"

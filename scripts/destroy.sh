@@ -5,11 +5,13 @@ set -e
 # Script Name	: destroy.sh
 # Description	: Destroys the infrastructure for `dev` and `pub`
 # Args          : $1 = Env to use
-#               : $2 = Component to destroy
-#               : $3 = Any additional terraform params
 # Author       	: Jonathan Fenwick
 # Email         : jonathan.fenwick@delineate.io
 ###################################################################
+
+[[ -z "$1" ]] && { echo "${WARN}Environment not provided${RESET}" ; exit 1; }
+
+BASE_ENV="${1}"
 
 # Adds
 function destroy() {
@@ -24,7 +26,7 @@ function destroy() {
     source "${ROOT}/env/${ENV}.env"
 
     # shellcheck disable=SC2034
-    GOOGLE_CREDENTIALS=$(cat "${HOME}/.gcloud/delineateio/platform/${ENV}/key.json")
+    GOOGLE_CREDENTIALS=$(cat "${HOME}/.gcloud/${ENV}/key.json")
 
     # Applies the terraform changes
     cd "${ROOT}/ops/cloud/${COMPONENT}"
@@ -50,12 +52,7 @@ function destroy() {
 
 clear
 
-# Dev environment
-destroy "dev" "ingress"
-destroy "dev" "database" "-var service_name=customers"
-destroy "dev" "cluster"
-
-# Dev environment
-destroy "pub" "ingress"
-destroy "dev" "database" "-var service_name=customers"
-destroy "pub" "cluster"
+# Environment
+destroy "${BASE_ENV}" "ingress"
+destroy "${BASE_ENV}" "database" "-var service_name=customers"
+destroy "${BASE_ENV}" "cluster"

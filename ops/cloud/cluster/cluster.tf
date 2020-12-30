@@ -68,8 +68,6 @@ resource "google_container_cluster" "app_cluster" {
 
 resource "google_container_node_pool" "app_cluster_nodes" {
 
-  # TODO: To remove once workload_metadata_config available in 'google' provider
-  provider = google-beta
   name     = "${var.cluster_name}-node-pool"
   location = local.zone
   cluster  = google_container_cluster.app_cluster.name

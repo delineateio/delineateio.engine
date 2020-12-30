@@ -6,7 +6,7 @@ NAME=destroy
 # remove, build & run
 docker rm $NAME -f || true
 docker build -t $NAME .
-docker run -d --name $NAME -v ~/.gcloud/delineateio/platform/dev:/.gcloud \
+docker run -d --name $NAME -v ~/.gcloud/dev:/.gcloud \
                            -p 8080:8080 \
                            -e DIO_ENV=dev \
                            -e DIO_REPO_URL=https://github.com/delineateio/platform.git \

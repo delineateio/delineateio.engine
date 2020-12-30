@@ -21,7 +21,6 @@ FROM alpine:3.12.0
 COPY --from=app-builder /etc/passwd /etc/passwd
 COPY --from=app-builder /etc/group /etc/group
 COPY --from=app-builder /go/bin/app /bin/app
-# ADD /home/vagrant/.gcloud/delineateio/platform/dev/key.json /.gcloud/key.json
 
 # Installs dependencies
 RUN apk update && apk add --no-cache libcap git wget unzip

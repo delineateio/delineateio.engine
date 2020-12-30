@@ -14,8 +14,10 @@ set -e
 FOLDER="${1}"
 ARGS="${2}"
 
-# shellcheck source=/dev/null
-source ~/.env
+if test -f "$HOME/.env"; then
+    # shellcheck source=/dev/null
+    source ~/.env
+fi
 
 cd "${FOLDER}"
 

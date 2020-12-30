@@ -1,56 +1,26 @@
-Vagrant.require_version "=2.2.9"
-
-ansible_version   = "2.9.12"
-ansible_verbose   = false
-ansible_home      = "/home/vagrant/project/vm"
-install_playbooks = ["bootstrap","profile","facts","docker","cloud","go","cli"]
-config_playbooks  = ["profile","docker","cloud","proxy","starship","git"]
+Vagrant.require_version ">=2.2.14"
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "bento/ubuntu-18.04"
-  config.vm.box_version = "202005.21.0"
+    config.vm.box = "delineateio/box"
+    config.vm.box_version = "1.0.1"
 
-  # Priority order of providers
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 4096
-    v.cpus = 2
-    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-    v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-    v.customize ["modifyvm", :id, "--ioapic", "on"]
-  end
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.synced_folder "./box", "/ansible"
+    config.vm.synced_folder ".", "/home/vagrant/project"
 
-  # Changes the default project sync dir
-  config.vm.network :private_network, ip: "10.11.12.13"
-  config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder ".", "/home/vagrant/project", :nfs => true
-  config.vm.synced_folder "~/.gcloud/delineateio/platform", "/home/vagrant/.gcloud/delineateio/platform", :nfs => true
+    config.vm.provision "file", source: "~/.gcloud/delineateio/platform/dev/key.json", destination: "~/.gcloud.json"
+    config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
+    config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
 
-  install_playbooks.each do |playbook|
     config.vm.provision "ansible_local" do |ansible|
-      ansible.provisioning_path = "#{ansible_home}/install"
-      ansible.version           = ansible_version
-      ansible.verbose           = ansible_verbose
-      ansible.playbook          = "#{playbook}.yml"
+      ansible.version           = "2.9.16"
+      ansible.provisioning_path = "/ansible"
+      ansible.playbook          = "provision.yml"
+      ansible.verbose           = false
     end
+
+    # Ports into the VM (HTTP, HTTPS, Posgres)
+    config.vm.network "forwarded_port", guest: 5432, host: 5432, protocol: "tcp"
+
   end
-
-  config_playbooks.each do |playbook|
-    config.vm.provision "ansible_local" do |ansible|
-      ansible.provisioning_path = "#{ansible_home}/config"
-      ansible.version           = ansible_version
-      ansible.verbose           = ansible_verbose
-      ansible.playbook          = "#{playbook}.yml"
-    end
-  end
-
-  # copies the ssh keys
-  config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-
-  # Ports into the VM (HTTP, HTTPS, Posgres)
-  config.vm.network "forwarded_port", guest: 80, host: 80, protocol: "tcp"
-  config.vm.network "forwarded_port", guest: 443, host: 443, protocol: "tcp"
-  config.vm.network "forwarded_port", guest: 5432, host: 5432, protocol: "tcp"
-
-end

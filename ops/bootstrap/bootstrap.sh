@@ -23,7 +23,7 @@ PROJECT="${2}"
 REGION="${3}"
 USER="infrastructure"
 SERVICE_ACCOUNT="${USER}@${PROJECT}.iam.gserviceaccount.com"
-KEY_FILE="$HOME/.gcloud/delineateio/platform/$ENV/key.json"
+KEY_FILE="$HOME/.gcloud/$ENV/key.json"
 
 echo
 echo "Env:      ${DETAIL}${ENV}${RESET}"
@@ -87,11 +87,11 @@ echo "${START}Creating Cloudflare secrets...${RESET}"
 
 gcloud secrets create "cloudflare-token" \
                             --replication-policy "automatic" \
-                            --data-file ".secure/token"
+                            --data-file "secrets/.token"
 
 gcloud secrets create "cloudflare-zone" \
                             --replication-policy "automatic" \
-                            --data-file ".secure/zone"
+                            --data-file "secrets/.zone"
 
 echo "${START}Cloudflare secrets created${RESET}"
 echo

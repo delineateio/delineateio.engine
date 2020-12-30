@@ -94,7 +94,7 @@ resource "google_cloud_scheduler_job" "destroy_job" {
 
   pubsub_target {
     topic_name = google_pubsub_topic.destroy_job_topic.id
-    data       = base64encode(templatefile("${path.module}/destroy/config.json", { env = "${var.env}" }))
+    data       = base64encode(templatefile("${path.module}/destroy/config.json", { env = var.env }))
   }
 
   depends_on = [google_project_iam_member.infrastructure_app_engine_creator]

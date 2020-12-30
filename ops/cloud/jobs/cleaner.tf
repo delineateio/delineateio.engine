@@ -50,7 +50,7 @@ resource "google_cloud_scheduler_job" "clean_job" {
   http_target {
     http_method = "POST"
     uri         = "${google_cloud_run_service.clean_job.status[0].url}/http"
-    body        = base64encode(templatefile("${path.module}/clean/config.json", { project = "${local.project}", registry = "${var.registry}" }))
+    body        = base64encode(templatefile("${path.module}/clean/config.json", { project = local.project, registry = var.registry }))
 
     oidc_token {
       audience              = "${google_cloud_run_service.clean_job.status[0].url}/http"
